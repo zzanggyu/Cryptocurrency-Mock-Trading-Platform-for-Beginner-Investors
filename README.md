@@ -65,16 +65,3 @@
 3. 보안 강화를 위한 인증/인가 시스템 구축
 4. 확장성을 고려한 모듈러 아키텍처 설계
 
-# 다이어그램
-
-![ERD](https://prod-files-secure.s3.us-west-2.amazonaws.com/619fda8d-fee5-4999-bb68-d404d988d288/69451c76-0544-4149-aaf8-ea27280bd2cd/image.png)
-
-ERD
-
-![Class Diagram](https://prod-files-secure.s3.us-west-2.amazonaws.com/619fda8d-fee5-4999-bb68-d404d988d288/9bf76f6a-4d29-45ac-8ad6-ba97282f5abb/image.png)
-
-Class Diagram
-
-![Story Board](https://prod-files-secure.s3.us-west-2.amazonaws.com/619fda8d-fee5-4999-bb68-d404d988d288/5ecb092b-2e34-420e-bcc2-a4494fe57dc8/image.png)
-
-Story Board
