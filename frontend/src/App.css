@@ -1,0 +1,70 @@
+.positive-value {
+  color: red;
+}
+
+.negative-value {
+  color: blue;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+h1, h2 {
+  margin: 20px 0;
+}
+
+.more-button {
+  display: block;
+  margin: 10px auto;
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.more-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* App.css */
+.tab-nav {
+  display: flex;
+  background-color: #093687;
+  padding: 0 20px;
+}
+
+.tab-button {
+  padding: 15px 20px;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background-color: #1E4CA1;
+}
+
+.tab-button.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
