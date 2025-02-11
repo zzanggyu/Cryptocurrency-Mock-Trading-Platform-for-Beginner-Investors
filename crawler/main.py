@@ -2,12 +2,12 @@ import os
 import pandas as pd
 from utils.setup_driver import setup_driver
 from utils.send_data import send_to_spring_boot
-from weekly_trends import get_weekly_trends
+from crawling_data.weekly_trends import get_weekly_trends
 from datetime import datetime
-from asset_info import get_asset_info
-from market_cap import get_market_data
-from buying_rank import get_buying_rank
-from selling_rank import get_selling_rank
+from crawling_data.asset_info import get_asset_info
+from crawling_data.market_cap import get_market_data
+from crawling_data.buying_rank import get_buying_rank
+from crawling_data.selling_rank import get_selling_rank
 
 csv_directory = "csv"
 if not os.path.exists(csv_directory):
