@@ -1,0 +1,90 @@
+.app {
+    min-height: 100vh;
+}
+
+.nav-bar {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 2rem;
+    background-color: #87CEEB;
+    color: white;
+    height: 60px;
+}
+
+.nav-logo {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    margin-right: 2rem;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 2rem;
+    margin-right: auto;
+}
+
+.menu-item {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: row;  /* 세로 배치 */
+    align-items: center;
+    color: #333;  /* 글자색 진하게 */
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    margin-right: 1rem;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;  /* 줄바꿈 방지 */
+}
+
+.logout-btn {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 0.3rem 0.6rem;  /* 패딩 줄임 */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    height: 32px;
+    min-width: 60px;  /* 최소 너비 설정 */
+    white-space: nowrap;  /* 줄바꿈 방지 */
+}
+
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.session-timer {
+    font-size: 0.8rem;
+    color: #666;
+}
