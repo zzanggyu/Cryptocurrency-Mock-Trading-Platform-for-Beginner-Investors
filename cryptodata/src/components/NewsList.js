@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import NewsCard from './NewsCard';
 import axios from 'axios';
 
@@ -32,7 +32,7 @@ const NewsList = () => {
        'Block TV'
    ];
 
-   const fetchNews = async () => {
+   const fetchNews = useCallback(async () => {
     try {
         setLoading(true);
         let response;
@@ -98,7 +98,7 @@ const NewsList = () => {
     } finally {
         setLoading(false);
     }
-};
+}, [selectedCategory, actualSearchTerm,  page, isLoggedIn]);
    // 카테고리나 검색어 변경시 초기화 및 데이터 가져오기
    useEffect(() => {
        setPage(0);
@@ -107,14 +107,14 @@ const NewsList = () => {
            setHasMore(true);  // 관심 뉴스로 전환시 hasMore 초기화
        }
        fetchNews();
-   }, [selectedCategory, actualSearchTerm]);
+   }, [selectedCategory, actualSearchTerm, fetchNews]);
 
    // 페이지 변경시 데이터 가져오기
    useEffect(() => {
        if (page > 0) {
            fetchNews();
        }
-   }, [page]);
+   }, [page, fetchNews]);
 
    const handleSearch = (e) => {
        e.preventDefault();
