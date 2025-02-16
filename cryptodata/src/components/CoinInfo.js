@@ -10,7 +10,7 @@ const CoinInfo = () => {
         sellingRank: []
     });
     const [showAllAssets, setShowAllAssets] = useState(false);
-    const [showAllMarket] = useState(false);
+    const [showAllMarket, setShowAllMarket] = useState(false);
     const [activeTab, setActiveTab] = useState('assets');
 
     useEffect(() => {
@@ -154,6 +154,16 @@ const CoinInfo = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            {allData.marketData.length > 10 && (
+                                <div className="flex justify-center mt-4">
+                                    <button 
+                                        onClick={() => setShowAllMarket(!showAllMarket)} 
+                                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        {showAllMarket ? '접기' : '더보기'}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
