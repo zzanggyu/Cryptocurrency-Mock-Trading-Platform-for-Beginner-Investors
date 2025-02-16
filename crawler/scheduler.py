@@ -9,7 +9,7 @@ def print_korean_time():
     return current_time
 
 def wait_until_next_update():
-    time.sleep(10)  # 10초 간격으로 실행
+    time.sleep(5)  # 5초 간격으로 실행
 
 while True:
     try:
@@ -20,7 +20,7 @@ while True:
         print(f"main.py 실행 완료")
         
         # 다음 실행 시간 출력
-        next_run = datetime.now(pytz.timezone('Asia/Seoul')) + timedelta(seconds=25)
+        next_run = datetime.now(pytz.timezone('Asia/Seoul')) + timedelta(seconds=5)
         print(f"다음 실행 예정 시간: {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')}")
         
         # 다음 갱신 시간까지 대기
