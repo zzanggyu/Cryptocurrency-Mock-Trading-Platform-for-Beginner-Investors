@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.crypto.trading.entity.News;
-import com.crypto.trading.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

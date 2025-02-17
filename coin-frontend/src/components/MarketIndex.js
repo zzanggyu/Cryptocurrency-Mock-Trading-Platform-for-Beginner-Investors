@@ -35,7 +35,7 @@ function MarketIndex() {
                 const response = await axios.get('http://localhost:8080/api/market/news', {
                     withCredentials: true
                 });
-                console.log('뉴스 응답:', response.data);
+				console.log('뉴스 응답:', response.data);
                 setNewsData(response.data);
             } catch (error) {
                 console.error('뉴스 조회 실패:', error);
@@ -100,7 +100,6 @@ function MarketIndex() {
                     {newsData.map((news) => (
                         <div key={news.id} className="news-item">
                             <a href={news.url} target="_blank" rel="noopener noreferrer">
-                                <img src={news.imageUrl} alt={news.title} className="news-thumbnail" />
                                 {news.title}
                             </a>
                             <span className="news-date">
