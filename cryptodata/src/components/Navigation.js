@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LoginModal from './LoginModal';
 
 const Navigation = ({ activeTab, setActiveTab }) => {
-    const tabs = ['거래소', '입출금', '투자내역', '코인동향', '서비스+', 'NFT', '뉴스'];
+    const tabs = ['거래소', '입출금', '투자내역', '코인동향', '서비스+', 'NFT'];
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isSignupMode, setIsSignupMode] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);

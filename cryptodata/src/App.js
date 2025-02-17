@@ -5,13 +5,13 @@ import CoinInfo from './components/CoinInfo';
 import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('뉴스');
+  const [activeTab, setActiveTab] = useState('코인동향');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {activeTab.toLowerCase() === '뉴스' && (
+      {activeTab.toLowerCase() === '코인동향' && (
         <div className="container mx-auto px-4 flex flex-col gap-6">
           {/* 뉴스 리스트 컨테이너 */}
           <div className="news-container">
