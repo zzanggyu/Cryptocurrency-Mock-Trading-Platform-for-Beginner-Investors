@@ -29,6 +29,7 @@ public class News {
     @Column(nullable = false)
     private String title;
     
+    
     @Column(columnDefinition = "TEXT")
     private String content;
     

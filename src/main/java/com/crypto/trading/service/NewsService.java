@@ -15,7 +15,7 @@ import java.util.List;
 public class NewsService {
     private final NewsRepository newsRepository;
     
-    // 최신 뉴스 10개 조회
+    // 최신 뉴스 10개 조회 
     public List<News> getLatestNews() {
         Pageable pageable = PageRequest.of(0, 7, Sort.by("publishDate").descending());
         Page<News> newsPage = newsRepository.findAllByOrderByPublishDateDesc(pageable);
