@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class MarketController {
-	RestTemplate restTemplate = new RestTemplate();
-	
-	@GetMapping("/market/ticker")
-	public ResponseEntity<?> getMarketTicker() {
-		try {
-			String url = "https://api.upbit.com/v1/ticker?markets=KRW-BTC,KRW-ETH,KRW-XRP,KRW-SOL,KRW-TRX";
-			
-			ResponseEntity<Object[]> response = restTemplate.getForEntity(url, Object[].class);
-			System.out.println("Ticker Response: " + response.getBody());
-			return ResponseEntity.ok(response.getBody());
-		} catch (Exception e) {
-			System.out.println("Ticker Error: " + e.getMessage());
-			return ResponseEntity.badRequest().body("시세 조회 실패 : " + e.getMessage());
-		}
-	}	
-	
+   RestTemplate restTemplate = new RestTemplate();  // HTTP 요청을 위한 RestTemplate 객체
+   
+   @GetMapping("/market/ticker")  // 코인 시세 조회
+   public ResponseEntity<?> getMarketTicker() {
+       try {
+           // 업비트 API에서 BTC, ETH, XRP, SOL, TRX 코인의 시세 정보 조회
+           String url = "https://api.upbit.com/v1/ticker?markets=KRW-BTC,KRW-ETH,KRW-XRP,KRW-SOL,KRW-TRX";
+           
+           ResponseEntity<Object[]> response = restTemplate.getForEntity(url, Object[].class);
+           System.out.println("Ticker Response: " + response.getBody());  // 응답 데이터 로그
+           return ResponseEntity.ok(response.getBody());
+       } catch (Exception e) {
+           System.out.println("Ticker Error: " + e.getMessage());  // 에러 로그
+           return ResponseEntity.badRequest().body("시세 조회 실패 : " + e.getMessage());
+       }
+   }
 }
