@@ -21,79 +21,78 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/boards")
-
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class BoardController {
-	private final BoardService boardService;
-	private final CommentService commentService;
-	
-	@GetMapping
-	public ResponseEntity<?> getAllBoards(HttpSession session){
-		try {
-			return ResponseEntity.ok(boardService.getAllBoards(session));
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getBoard(@PathVariable("id") Long id, HttpSession session) {
-		try {
-			return ResponseEntity.ok(boardService.getBoard(id, session));
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@PostMapping
-	public ResponseEntity<?> createBoard(@RequestBody BoardDTO board, HttpSession session) {
-		try {
-			return ResponseEntity.ok(boardService.createBoard(board, session));
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateBoard(@PathVariable("id") Long id,@RequestBody BoardDTO board, HttpSession session) {
-		try {
-			return ResponseEntity.ok(boardService.updateBoard(id, board, session));
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@PostMapping("/{id}/like")
-	public ResponseEntity<?> likeBoard(@PathVariable("id") Long id, HttpSession session){
-		try {
-			boardService.likeBoard(id,session);
-			return ResponseEntity.ok().build();
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteBoard(@PathVariable("id") Long id, HttpSession session){
-		try {
-			boardService.deleteBoard(id, session);
-			return ResponseEntity.ok().build();
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@PostMapping("/{boardId}/comments")
-	   public ResponseEntity<?> createComment(@PathVariable("boardId") Long boardId, @RequestBody CommentDTO commentDto, HttpSession session) {
-	       try {
-	           return ResponseEntity.ok(commentService.createComment(boardId, commentDto, session));
-	       } catch (RuntimeException e) {
-	           return ResponseEntity.badRequest().body(e.getMessage());
-	       }
-	   }
+   private final BoardService boardService;         // 게시글 관련 서비스
+   private final CommentService commentService;     // 댓글 관련 서비스
+   
+   @GetMapping  // 게시글 목록 조회
+   public ResponseEntity<?> getAllBoards(HttpSession session){
+       try {
+           return ResponseEntity.ok(boardService.getAllBoards(session));  // 세션 정보를 포함하여 목록 조회
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @GetMapping("/{id}")  // 게시글 상세 조회
+   public ResponseEntity<?> getBoard(@PathVariable("id") Long id, HttpSession session) {
+       try {
+           return ResponseEntity.ok(boardService.getBoard(id, session));  // ID로 게시글 조회
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @PostMapping  // 새 게시글 작성
+   public ResponseEntity<?> createBoard(@RequestBody BoardDTO board, HttpSession session) {
+       try {
+           return ResponseEntity.ok(boardService.createBoard(board, session));
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @PutMapping("/{id}")  // 게시글 수정
+   public ResponseEntity<?> updateBoard(@PathVariable("id") Long id, @RequestBody BoardDTO board, HttpSession session) {
+       try {
+           return ResponseEntity.ok(boardService.updateBoard(id, board, session));
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @PostMapping("/{id}/like")  // 게시글 좋아요
+   public ResponseEntity<?> likeBoard(@PathVariable("id") Long id, HttpSession session){
+       try {
+           boardService.likeBoard(id,session);
+           return ResponseEntity.ok().build();
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @DeleteMapping("/{id}")  // 게시글 삭제
+   public ResponseEntity<?> deleteBoard(@PathVariable("id") Long id, HttpSession session){
+       try {
+           boardService.deleteBoard(id, session);
+           return ResponseEntity.ok().build();
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @PostMapping("/{boardId}/comments")  // 댓글 작성
+   public ResponseEntity<?> createComment(@PathVariable("boardId") Long boardId, @RequestBody CommentDTO commentDto, HttpSession session) {
+       try {
+           return ResponseEntity.ok(commentService.createComment(boardId, commentDto, session));
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
 
-   @PutMapping("/comments/{id}")
+   @PutMapping("/comments/{id}")  // 댓글 수정
    public ResponseEntity<?> updateComment(@PathVariable("id") Long id, @RequestBody CommentDTO commentDto, HttpSession session) {
        try {
            return ResponseEntity.ok(commentService.updateComment(id, commentDto, session));
@@ -102,7 +101,7 @@ public class BoardController {
        }
    }
 
-   @DeleteMapping("/comments/{id}") 
+   @DeleteMapping("/comments/{id}")  // 댓글 삭제
    public ResponseEntity<?> deleteComment(@PathVariable("id") Long id, HttpSession session) {
        try {
            commentService.deleteComment(id, session);

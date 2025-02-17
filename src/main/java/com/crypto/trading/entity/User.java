@@ -15,38 +15,36 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
 @Table(name = "user")
 public class User {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long userId;                 // 사용자 고유 ID
 
     @Column(unique = true, nullable = false)
-    private String username;
+    private String username;             // 사용자 아이디(로그인용)
     
     @Column(unique = true, nullable = false)
-    private String nickname;
+    private String nickname;             // 사용자 닉네임(표시용)
 
     @Column(unique = true, nullable = false)
-    private String email;
+    private String email;                // 이메일
 
     @Column(nullable = false)
-    private String password; // BCrypt로 암호화
+    private String password;             // BCrypt로 암호화된 비밀번호
 
     @Column(name = "create_at")
-    private LocalDateTime createAt;
+    private LocalDateTime createAt;      // 계정 생성일시
 
-    private String style;  // 투자 성향
+    private String style;                // 투자 성향
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private VirtualAccount virtualAccount;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)  // 일대일 관계: 사용자당 하나의 가상계좌
+    private VirtualAccount virtualAccount;  // 가상계좌 정보
 
     @PrePersist
-    public void prePersist() {
+    public void prePersist() {          // 계정 생성 시 현재 시간 자동 설정
         this.createAt = LocalDateTime.now();
     }
 }

@@ -20,23 +20,23 @@ import lombok.Setter;
 @Table(name = "comments")
 @NoArgsConstructor
 public class Comment {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String content;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "board_id")
-	private Board board;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-	
-	private LocalDateTime createdAt;
-	
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;                     // 댓글 고유 ID
+    private String content;              // 댓글 내용
+    
+    @ManyToOne(fetch = FetchType.LAZY)  // 다대일 관계: 한 게시글에 여러 댓글
+    @JoinColumn(name = "board_id")
+    private Board board;                 // 댓글이 달린 게시글
+    
+    @ManyToOne(fetch = FetchType.LAZY)  // 다대일 관계: 한 사용자가 여러 댓글 작성 가능
+    @JoinColumn(name = "user_id")
+    private User user;                   // 댓글 작성자
+    
+    private LocalDateTime createdAt;     // 작성일시
+    
+    @PrePersist
+    protected void onCreate() {          // 댓글 생성 시 현재 시간 자동 설정
+        this.createdAt = LocalDateTime.now();
+    }
 }

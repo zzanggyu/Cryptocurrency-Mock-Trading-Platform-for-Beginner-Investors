@@ -24,50 +24,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class FavoriteController {
-	private final FavoriteService favoriteService;
-	
-	@GetMapping
-	public ResponseEntity<?> getFavorites(HttpSession session){
-		UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
-		if(user == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-		}
-		
-		try {
-			return ResponseEntity.ok(favoriteService.getFavorites(user.getUsername()));
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@PostMapping
-	public ResponseEntity<?> addFavorite(@RequestBody Map<String, String> request, HttpSession session) {
-		UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
-		if(user == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-		}
-		
-		try {
-			favoriteService.addFavorite(user.getUsername(), request.get("symbol"), request.get("coinname"));
-			return ResponseEntity.ok().build();
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
-	@DeleteMapping("/{symbol}")
-	public ResponseEntity<?> deleteFavorite(@PathVariable("symbol") String symbol, HttpSession session){
-		UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
-		if(user == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-		}
-		
-		try {
-			favoriteService.deleteFavorite(user.getUsername(), symbol);
-			return ResponseEntity.ok().build();
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
-	
+   private final FavoriteService favoriteService;  // 즐겨찾기 관련 서비스
+   
+   @GetMapping  // 즐겨찾기 목록 조회
+   public ResponseEntity<?> getFavorites(HttpSession session){
+       UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+       if(user == null) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+       }
+       
+       try {
+           return ResponseEntity.ok(favoriteService.getFavorites(user.getUsername()));
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @PostMapping  // 새 즐겨찾기 추가
+   public ResponseEntity<?> addFavorite(@RequestBody Map<String, String> request, HttpSession session) {
+       UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+       if(user == null) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+       }
+       
+       try {
+           favoriteService.addFavorite(user.getUsername(), request.get("symbol"), request.get("coinname"));
+           return ResponseEntity.ok().build();
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+   
+   @DeleteMapping("/{symbol}")  // 즐겨찾기 삭제
+   public ResponseEntity<?> deleteFavorite(@PathVariable("symbol") String symbol, HttpSession session){
+       UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+       if(user == null) {
+           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+       }
+       
+       try {
+           favoriteService.deleteFavorite(user.getUsername(), symbol);
+           return ResponseEntity.ok().build();
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
 }
