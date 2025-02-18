@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LoginModal from './LoginModal';
+import './Navigation.css';
 
 const Navigation = ({ activeTab, setActiveTab }) => {
     const tabs = ['거래소', '입출금', '투자내역', '코인동향', '서비스+', 'NFT'];
@@ -8,7 +9,6 @@ const Navigation = ({ activeTab, setActiveTab }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
 
-    // 컴포넌트 마운트 시 로그인 상태 확인
     useEffect(() => {
         const token = localStorage.getItem('token');
         const savedUsername = localStorage.getItem('username');
@@ -33,7 +33,7 @@ const Navigation = ({ activeTab, setActiveTab }) => {
         localStorage.removeItem('username');
         setIsLoggedIn(false);
         setUsername('');
-        window.location.reload(); // 페이지 새로고침
+        window.location.reload();
     };
 
     const handleLoginSuccess = (username) => {
@@ -43,17 +43,15 @@ const Navigation = ({ activeTab, setActiveTab }) => {
     };
 
     return (
-        <nav className="bg-[#c9e3f7]">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex justify-between">
-                    <div className="flex space-x-8">
+        <nav className="nav-wrapper">
+            <div className="nav-container">
+                <div className="nav-content">
+                    <div className="tab-list">
                         {tabs.map((tab) => (
                             <button
                                 key={tab}
-                                className={`py-4 px-3 text-sm font-medium ${
-                                    activeTab === tab.toLowerCase() 
-                                        ? 'text-blue-600 border-b-2 border-blue-600'
-                                        : 'text-gray-700 hover:text-blue-600'
+                                className={`tab-button ${
+                                    activeTab === tab.toLowerCase() ? 'active' : ''
                                 }`}
                                 onClick={() => setActiveTab(tab.toLowerCase())}
                             >
@@ -62,13 +60,13 @@ const Navigation = ({ activeTab, setActiveTab }) => {
                         ))}
                     </div>
                     
-                    <div className="flex items-center space-x-2">
+                    <div className="user-section">
                         {isLoggedIn ? (
                             <>
-                                <span className="text-sm text-gray-700">{username}님</span>
-                                <div className="w-px h-4 bg-gray-300"></div>
+                                <span className="username">{username}님</span>
+                                <div className="divider"></div>
                                 <button 
-                                    className="px-4 py-1 text-sm text-gray-700 hover:text-blue-600"
+                                    className="auth-button"
                                     onClick={handleLogout}
                                 >
                                     로그아웃
@@ -77,21 +75,21 @@ const Navigation = ({ activeTab, setActiveTab }) => {
                         ) : (
                             <>
                                 <button 
-                                    className="px-4 py-1 text-sm text-gray-700 hover:text-blue-600" 
+                                    className="auth-button"
                                     onClick={handleLoginClick}
                                 >
                                     로그인
                                 </button>
-                                <div className="w-px h-4 bg-gray-300"></div>
+                                <div className="divider"></div>
                                 <button 
-                                    className="px-4 py-1 text-sm text-gray-700 hover:text-blue-600"
+                                    className="auth-button"
                                     onClick={handleSignupClick}
                                 >
                                     회원가입
                                 </button>
                             </>
                         )}
-                        <select className="ml-2 px-2 py-1 text-sm bg-transparent border-none text-gray-700">
+                        <select className="language-select">
                             <option value="ko">한국어</option>
                             <option value="en">EN</option>
                         </select>

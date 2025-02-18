@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './CoinInfo.css';
 
 const CoinInfo = () => {
     const [allData, setAllData] = useState({
@@ -38,28 +39,28 @@ const CoinInfo = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex gap-6">
-                {/* 왼쪽 주요 정보 영역 - 2/3 너비로 줄임 */}
-                <div className="flex-grow-0 w-2/3 space-y-6">
+        <div className="coin-info-container">
+            <div className="coin-info-wrapper">
+                {/* 왼쪽 주요 정보 영역 */}
+                <div className="main-content">
                     {/* 주간 상승률 */}
-                    <div className="bg-white rounded-lg shadow p-5">
-                        <h2 className="text-xl font-bold mb-4">주간 상승률</h2>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full">
-                                <thead className="bg-gray-50">
+                    <div className="card weekly-trends">
+                        <h2 className="card-title">주간 상승률</h2>
+                        <div className="table-wrapper">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">순위</th>
-                                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">코인명</th>
-                                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">변동률</th>
+                                        <th>순위</th>
+                                        <th>코인명</th>
+                                        <th>변동률</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     {allData.weeklyTrends.map((item) => (
                                         <tr key={item.id}>
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.title}</td>
-                                            <td className={`px-4 py-3 whitespace-nowrap text-sm ${getTextColor(item.changePercent)}`}>
+                                            <td>{item.id}</td>
+                                            <td>{item.title}</td>
+                                            <td className={getTextColor(item.changePercent)}>
                                                 {item.changePercent}
                                             </td>
                                         </tr>
@@ -68,63 +69,59 @@ const CoinInfo = () => {
                             </table>
                         </div>
                     </div>
-    
+
                     {/* 탭 메뉴 */}
-                    <div className="bg-white rounded-lg shadow p-5">
-                        <div className="flex justify-between border-b pb-2">
-                            <h2 className="text-xl font-bold text-gray-900">디지털 자산</h2>
-                            <div className="flex space-x-3">
+                    <div className="card digital-assets">
+                        <div className="tab-header">
+                            <h2 className="card-title">디지털 자산</h2>
+                            <div className="tab-buttons">
                                 <button
-                                    className={`px-3 py-2 text-base font-medium ${
-                                        activeTab === 'assets' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'
-                                    }`}
+                                    className={`tab-button ${activeTab === 'assets' ? 'active' : ''}`}
                                     onClick={() => setActiveTab('assets')}
                                 >
                                     기간별 상승률
                                 </button>
                                 <button
-                                    className={`px-3 py-2 text-base font-medium ${
-                                        activeTab === 'market' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'
-                                    }`}
+                                    className={`tab-button ${activeTab === 'market' ? 'active' : ''}`}
                                     onClick={() => setActiveTab('market')}
                                 >
                                     시가총액
                                 </button>
                             </div>
                         </div>
-    
+
                         {/* 자산 정보 */}
                         {activeTab === 'assets' && (
-                            <div className="overflow-x-auto mt-4">
-                                <table className="min-w-full">
-                                    <thead className="bg-gray-50">
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">자산명</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">주간</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">월간</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">3개월</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">6개월</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">연간</th>
+                                            <th>자산명</th>
+                                            <th>주간</th>
+                                            <th>월간</th>
+                                            <th>3개월</th>
+                                            <th>6개월</th>
+                                            <th>연간</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody>
                                         {displayedAssets.map((item) => (
                                             <tr key={item.id}>
-                                                <td className="px-3 py-3 whitespace-nowrap text-xs text-gray-900">{item.name}</td>
-                                                <td className={`px-3 py-3 whitespace-nowrap text-xs ${getTextColor(item.weeklyGain)}`}>{item.weeklyGain}</td>
-                                                <td className={`px-3 py-3 whitespace-nowrap text-xs ${getTextColor(item.monthlyGain)}`}>{item.monthlyGain}</td>
-                                                <td className={`px-3 py-3 whitespace-nowrap text-xs ${getTextColor(item.threemonthGain)}`}>{item.threemonthGain}</td>
-                                                <td className={`px-3 py-3 whitespace-nowrap text-xs ${getTextColor(item.sixmonthGain)}`}>{item.sixmonthGain}</td>
-                                                <td className={`px-3 py-3 whitespace-nowrap text-xs ${getTextColor(item.yearlyGain)}`}>{item.yearlyGain}</td>
+                                                <td>{item.name}</td>
+                                                <td className={getTextColor(item.weeklyGain)}>{item.weeklyGain}</td>
+                                                <td className={getTextColor(item.monthlyGain)}>{item.monthlyGain}</td>
+                                                <td className={getTextColor(item.threemonthGain)}>{item.threemonthGain}</td>
+                                                <td className={getTextColor(item.sixmonthGain)}>{item.sixmonthGain}</td>
+                                                <td className={getTextColor(item.yearlyGain)}>{item.yearlyGain}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                                 {allData.assetInfo.length > 10 && (
-                                    <div className="flex justify-center mt-4">
+                                    <div className="button-wrapper">
                                         <button 
                                             onClick={() => setShowAllAssets(!showAllAssets)} 
-                                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                                            className="toggle-button"
                                         >
                                             {showAllAssets ? '접기' : '더보기'}
                                         </button>
@@ -132,35 +129,35 @@ const CoinInfo = () => {
                                 )}
                             </div>
                         )}
-    
+
                         {/* 시가총액 정보 */}
                         {activeTab === 'market' && (
-                            <div className="overflow-x-auto mt-4">
-                                <table className="min-w-full">
-                                    <thead className="bg-gray-50">
+                            <div className="table-wrapper">
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">순위</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">코인명</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">시가총액</th>
-                                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500">거래대금</th>
+                                            <th>순위</th>
+                                            <th>코인명</th>
+                                            <th>시가총액</th>
+                                            <th>거래대금</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody>
                                         {displayedMarket.map((item) => (
                                             <tr key={item.id}>
-                                                <td className="px-3 py-3 whitespace-nowrap text-xs text-gray-900">{item.rank}</td>
-                                                <td className="px-3 py-3 text-xs text-gray-900">{item.name}</td>
-                                                <td className="px-3 py-3 text-xs text-gray-900">{item.marketcap}</td>
-                                                <td className="px-3 py-3 text-xs text-gray-900">{item.transactionvalue}</td>
+                                                <td>{item.rank}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.marketcap}</td>
+                                                <td>{item.transactionvalue}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                                 {allData.marketData.length > 10 && (
-                                    <div className="flex justify-center mt-4">
+                                    <div className="button-wrapper">
                                         <button 
                                             onClick={() => setShowAllMarket(!showAllMarket)} 
-                                            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                                            className="toggle-button"
                                         >
                                             {showAllMarket ? '접기' : '더보기'}
                                         </button>
@@ -170,27 +167,27 @@ const CoinInfo = () => {
                         )}
                     </div>
                 </div>
-    
-                {/* 오른쪽 매수/매도 체결 강도 영역 - 1/3 너비로 늘림 */}
-                <div className="w-1/3 space-y-6">
+
+                {/* 오른쪽 매수/매도 체결 강도 영역 */}
+                <div className="side-content">
                     {/* 매수 체결 강도 */}
-                    <div className="bg-white rounded-lg shadow p-5">
-                        <h2 className="text-xl font-bold mb-4">매수 체결 강도</h2>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full">
-                                <thead className="bg-gray-50">
+                    <div className="card buying-rank">
+                        <h2 className="card-title">매수 체결 강도</h2>
+                        <div className="table-wrapper">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-500">순위</th>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-500">코인명</th>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-500">변동률</th>
+                                        <th>순위</th>
+                                        <th>코인명</th>
+                                        <th>변동률</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     {allData.buyingRank.map((item) => (
                                         <tr key={item.id}>
-                                            <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-                                            <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">{item.title}</td>
-                                            <td className={`px-3 py-3 whitespace-nowrap text-sm ${getTextColor(item.changePercent)}`}>
+                                            <td>{item.id}</td>
+                                            <td>{item.title}</td>
+                                            <td className={getTextColor(item.changePercent)}>
                                                 {item.changePercent}
                                             </td>
                                         </tr>
@@ -199,25 +196,25 @@ const CoinInfo = () => {
                             </table>
                         </div>
                     </div>
-    
+
                     {/* 매도 체결 강도 */}
-                    <div className="bg-white rounded-lg shadow p-5">
-                        <h2 className="text-xl font-bold mb-4">매도 체결 강도</h2>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full">
-                                <thead className="bg-gray-50">
+                    <div className="card selling-rank">
+                        <h2 className="card-title">매도 체결 강도</h2>
+                        <div className="table-wrapper">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-500">순위</th>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-500">코인명</th>
-                                        <th className="px-3 py-3 text-left text-sm font-medium text-gray-500">변동률</th>
+                                        <th>순위</th>
+                                        <th>코인명</th>
+                                        <th>변동률</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     {allData.sellingRank.map((item) => (
                                         <tr key={item.id}>
-                                            <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-                                            <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">{item.title}</td>
-                                            <td className={`px-3 py-3 whitespace-nowrap text-sm ${getTextColor(item.changePercent)}`}>
+                                            <td>{item.id}</td>
+                                            <td>{item.title}</td>
+                                            <td className={getTextColor(item.changePercent)}>
                                                 {item.changePercent}
                                             </td>
                                         </tr>
