@@ -25,7 +25,11 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/signup", 
                     "/api/login", 
-                    "/api/market/ticker"
+                    "/api/market/ticker",
+                    "/api/news/**",         // 뉴스 관련 엔드포인트 추가
+                    "/api/all-data/**",     // 시장 데이터 관련 추가
+                    "/api/assets/**",       // 자산 정보 관련 추가
+                    "/api/markets/**"       // 마켓 데이터 관련 추가
                 ).permitAll()
                 // 나머지 /api/** 경로는 인증 필요
                 .requestMatchers("/api/**").authenticated()
