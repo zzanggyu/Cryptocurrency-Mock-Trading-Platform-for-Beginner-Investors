@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>계좌 생성 | 가상자산 거래 시스템</title>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+   <style>
+	body {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		margin: 0;
+		padding: 20px;
+		background-color: #f5f5f5;
+	}
+
+       .navigation {
+           background-color: #EFDC05;
+           padding: 1rem;
+           margin-bottom: 2rem;
+       }
+
+       .navigation a {
+           color: white;
+           text-decoration: none;
+           padding: 0.5rem 1rem;
+           margin-right: 1rem;
+       }
+
+       .navigation a:hover {
+           background-color: #555;
+           border-radius: 4px;
+       }
+
+       .container {
+           max-width: 600px;
+           margin: 0 auto;
+           padding: 20px;
+       }
+
+       .card {
+           background-color: white;
+           padding: 2rem;
+           border-radius: 8px;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+       }
+
+       h1 {
+           text-align: center;
+           color: #333;
+           margin-bottom: 2rem;
+       }
+
+       .form-group {
+           margin-bottom: 1.5rem;
+       }
+
+       label {
+           display: block;
+           margin-bottom: 0.5rem;
+           font-weight: bold;
+           color: #555;
+       }
+
+       input, select {
+           width: 100%;
+           padding: 0.75rem;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           box-sizing: border-box;
+           font-size: 1rem;
+       }
+
+       input:focus, select:focus {
+           outline: none;
+           border-color: skyblue;
+           box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+       }
+
+       button {
+           width: 100%;
+           padding: 1rem;
+           background-color: #EFDC05;
+           color: white;
+           border: none;
+           border-radius: 4px;
+           font-size: 1rem;
+           cursor: pointer;
+           margin-top: 1rem;
+       }
+
+       button:hover {
+           background-color: deepskyblue;
+       }
+
+       .investment-info {
+           background-color: #f8f9fa;
+           border-left: 4px solid #4CAF50;
+           padding: 1rem;
+           margin-top: 1rem;
+           border-radius: 4px;
+       }
+
+       .investment-info p {
+           margin: 0.5rem 0;
+           color: #666;
+       }
+
+       .info-value {
+           font-weight: bold;
+           color: #333;
+       }
+
+       .success-message {
+           background-color: #dff0d8;
+           color: #3c763d;
+           padding: 1rem;
+           border-radius: 4px;
+           margin-top: 1rem;
+           display: none;
+       }
+   </style>
+</head>
+<body>
+	<nav class="navigation">
+	    <a href="createaccount.html">계좌 생성</a>
+	    <a href="accountlist.html">내 계좌</a>
+	    <a href="trading.html">거래하기</a>
+		<a href="investment.html">투자내역</a>
+	</nav>
+
+   <div class="container">
+       <div class="card">
+           <h1>새 계좌 생성</h1>
+           <form id="createAccountForm" onsubmit="return false;">
+               <div class="form-group">
+                   <label for="userId">사용자 ID</label>
+                   <input type="text" 
+                          id="userId" 
+                          pattern="^[a-zA-Z0-9]+$" 
+                          title="영문자와 숫자만 입력 가능합니다" 
+                          required>
+               </div>
+
+               <div class="form-group">
+                   <label for="initialBalance">초기 예치금</label>
+                   <input type="number" 
+                          id="initialBalance" 
+                          min="0" 
+                          step="1000" 
+                          required 
+                          oninput="updateEstimatedInvestment()"
+                          placeholder="최소 예치금: 100,000원">
+               </div>
+
+               <div class="form-group">
+                   <label for="riskLevel">투자성향</label>
+                   <select id="riskLevel" required onchange="updateEstimatedInvestment()">
+                       <option value="CONSERVATIVE">보수적 (투자한도: 잔액의 10%)</option>
+                       <option value="MODERATELY_CONSERVATIVE">약간 보수적 (투자한도: 잔액의 15%)</option>
+                       <option value="MODERATE">보통 (투자한도: 잔액의 20%)</option>
+                       <option value="MODERATELY_AGGRESSIVE">약간 공격적 (투자한도: 잔액의 25%)</option>
+                       <option value="AGGRESSIVE">공격적 (투자한도: 잔액의 30%)</option>
+                   </select>
+               </div>
+
+               <div id="estimatedInvestment" class="investment-info" style="display: none;">
+                   <p>예상 투자한도: <span id="estimatedAmount" class="info-value">0</span> 원</p>
+                   <p>투자 비율: <span id="investmentPercentage" class="info-value">0</span>%</p>
+               </div>
+
+               <div id="successMessage" class="success-message">
+                   계좌가 성공적으로 생성되었습니다!
+               </div>
+
+               <button onclick="createAccount()">계좌 생성</button>
+           </form>
+       </div>
+   </div>
+
+   <script>
+       const API_BASE_URL = '/api/accounts';
+
+       function updateEstimatedInvestment() {
+           const balance = Number(document.getElementById('initialBalance').value) || 0;
+           const riskLevel = document.getElementById('riskLevel').value;
+           const percentage = getRiskPercentage(riskLevel);
+           const estimatedAmount = (balance * (percentage / 100)).toFixed(0);
+           
+           document.getElementById('estimatedAmount').textContent = Number(estimatedAmount).toLocaleString();
+           document.getElementById('investmentPercentage').textContent = percentage;
+           document.getElementById('estimatedInvestment').style.display = balance > 0 ? 'block' : 'none';
+       }
+
+       function getRiskPercentage(riskLevel) {
+           const percentages = {
+               'CONSERVATIVE': 10,
+               'MODERATELY_CONSERVATIVE': 15,
+               'MODERATE': 20,
+               'MODERATELY_AGGRESSIVE': 25,
+               'AGGRESSIVE': 30
+           };
+           return percentages[riskLevel] || 0;
+       }
+
+       async function createAccount() {
+           try {
+               const userId = document.getElementById('userId').value;
+               const initialBalance = document.getElementById('initialBalance').value;
+               const riskLevel = document.getElementById('riskLevel').value;
+
+               // 입력값 검증
+               if (Number(initialBalance) < 100000) {
+                   alert('초기 예치금은 100,000원 이상이어야 합니다.');
+                   return;
+               }
+
+               const data = {
+                   userId: userId,
+                   initialBalance: Number(initialBalance),
+                   riskLevel: riskLevel
+               };
+
+               const response = await axios.post(API_BASE_URL, data);
+               console.log('응답:', response.data);
+
+               // 성공 메시지 표시
+               const successMessage = document.getElementById('successMessage');
+               successMessage.style.display = 'block';
+               successMessage.scrollIntoView({ behavior: 'smooth' });
+
+               // 폼 초기화
+               setTimeout(() => {
+                   document.getElementById('createAccountForm').reset();
+                   document.getElementById('estimatedInvestment').style.display = 'none';
+                   successMessage.style.display = 'none';
+                   window.location.href = 'accountlist.html'; // 계좌 목록 페이지로 이동
+               }, 2000);
+           } catch (error) {
+               console.error('에러 상세:', error);
+               alert('계좌 생성 중 오류가 발생했습니다: ' + (error.response?.data || error.message));
+           }
+       }
+
+       // 초기 예상 투자금액 업데이트
+       updateEstimatedInvestment();
+   </script>
+</body>
+</html>

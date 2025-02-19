@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>거래하기 | 가상자산 거래 시스템</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <!-- CSS는 별도로 보여드리겠습니다 -->
+	<style>
+		/* 기본 레이아웃 */
+		/* 기본 레이아웃 */
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			margin: 0;
+			padding: 20px;
+			background-color: #f5f5f5;
+		}
+		
+		/* 계좌 선택하는 부분 */
+		.account-section {
+		    background: white;
+		    padding: 20px;
+		    border-radius: 4px;
+		    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+		    margin-bottom: 20px;
+		}
+
+		.account-info {
+		    margin-top: 15px;
+		    padding: 15px;
+		    background: #f8f9fa;
+		    border-radius: 4px;
+		}
+
+		.info-row {
+		    display: flex;
+		    justify-content: space-between;
+		    margin-bottom: 10px;
+		    padding: 5px 0;
+		}
+
+		.info-row:last-child {
+		    margin-bottom: 0;
+		}
+
+		.info-row span:first-child {
+		    color: #666;
+		}
+
+		.info-row span:last-child {
+		    font-weight: 500;
+		}
+
+	   .navigation {
+	       background-color: #EFDC05;
+	       padding: 1rem;
+	       margin-bottom: 2rem;
+	   }
+
+	   .navigation a {
+	       color: white;
+	       text-decoration: none;
+	       padding: 0.5rem 1rem;
+	       margin-right: 1rem;
+	   }
+
+	   .navigation a:hover {
+	       background-color: #555;
+	       border-radius: 4px;
+	   }
+
+		/* 탭 스타일 */
+		.tab-container {
+		    display: flex;
+		    border-bottom: 1px solid #dee2e6;
+		    margin-bottom: 20px;
+		}
+
+		.tab {
+		    padding: 15px 30px;
+		    cursor: pointer;
+		    color: #666;
+		    font-weight: 500;
+		    position: relative;
+		}
+
+		.tab.active {
+		    color: #1261c4;
+		    font-weight: bold;
+		}
+
+		.tab.active:after {
+		    content: '';
+		    position: absolute;
+		    bottom: -1px;
+		    left: 0;
+		    right: 0;
+		    height: 2px;
+		    background-color: #1261c4;
+		}
+
+		/* 주문 섹션 */
+		.order-section {
+		    background: white;
+		    padding: 20px;
+		    border-radius: 4px;
+		    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+		}
+
+		/* 폼 그룹 */
+		.form-group {
+		    margin-bottom: 20px;
+		}
+
+		/* 주문 유형 */
+		.order-type-group {
+		    margin-bottom: 20px;
+		}
+
+		.radio-group {
+		    display: flex;
+		    gap: 20px;
+		    margin-top: 10px;
+		}
+
+		.radio-group label {
+		    display: flex;
+		    align-items: center;
+		    gap: 5px;
+		    cursor: pointer;
+		}
+
+		/* select 스타일 */
+		select {
+		    width: 100%;
+		    padding: 12px;
+		    border: 1px solid #dee2e6;
+		    border-radius: 4px;
+		    font-size: 16px;
+		    background-color: white;
+		}
+
+		/* 금액 표시 */
+		.amount-display {
+		    background: #f8f9fa;
+		    padding: 12px;
+		    border-radius: 4px;
+		    margin-top: 8px;
+		    font-weight: bold;
+		}
+
+		.unit {
+		    color: #666;
+		    margin-left: 4px;
+		}
+
+		/* 가격 입력 */
+		.price-input {
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    margin-top: 8px;
+		}
+
+		.price-input input {
+		    flex: 1;
+		    padding: 12px;
+		    border: 1px solid #dee2e6;
+		    border-radius: 4px;
+		    font-size: 16px;
+		    text-align: right;
+		}
+
+		.price-controls {
+		    display: flex;
+		    gap: 4px;
+		}
+
+		.price-controls button {
+		    width: 40px;
+		    height: 42px;
+		    border: 1px solid #dee2e6;
+		    background: white;
+		    cursor: pointer;
+		    font-size: 18px;
+		}
+
+		/* 퍼센트 버튼 */
+		.percentage-buttons {
+		    display: flex;
+		    gap: 5px;
+		    margin-top: 8px;
+		}
+
+		.percentage-buttons button {
+		    flex: 1;
+		    padding: 8px 0;
+		    border: 1px solid #dee2e6;
+		    background: white;
+		    cursor: pointer;
+		    font-size: 14px;
+		}
+
+		.percentage-buttons button:hover {
+		    background: #f8f9fa;
+		}
+
+		/* 수수료 정보 */
+		.fee-info {
+		    margin: 20px 0;
+		    padding: 15px;
+		    background: #f8f9fa;
+		    border-radius: 4px;
+		    font-size: 13px;
+		    color: #666;
+		    display: flex;
+		    justify-content: space-between;
+		}
+
+		/* 주문 버튼 */
+		.order-buttons {
+		    display: grid;
+		    grid-template-columns: 1fr 1fr;
+		    gap: 10px;
+		    margin-top: 20px;
+		}
+
+		.reset-button {
+		    padding: 15px;
+		    border: none;
+		    border-radius: 4px;
+		    background: #f1f1f1;
+		    cursor: pointer;
+		    font-weight: bold;
+		}
+
+		.order-button {
+		    padding: 15px;
+		    border: none;
+		    border-radius: 4px;
+		    color: white;
+		    cursor: pointer;
+		    font-weight: bold;
+		}
+
+		.buy-button {
+		    background-color: #1261c4;
+		}
+
+		.sell-button {
+		    background-color: #d63947;
+		}
+		
+		/* 보유 수량 정보 스타일 */
+		.holding-info {
+		    color: #666;
+		    font-size: 0.9rem;
+		    margin-top: 8px;
+		    display: block;
+		}
+
+		/* 테이블 스타일 */
+		.order-table {
+		    width: 100%;
+		    border-collapse: collapse;
+		    margin-top: 20px;
+		}
+
+		.order-table th, 
+		.order-table td {
+		    padding: 12px;
+		    text-align: center;
+		    border-bottom: 1px solid #dee2e6;
+		}
+
+		.order-table th {
+		    background: #f8f9fa;
+		    font-weight: 500;
+		}
+
+		/* 입력 필드 공통 스타일 */
+		input[type="text"],
+		input[type="number"] {
+		    width: 100%;
+		    padding: 12px;
+		    border: 1px solid #dee2e6;
+		    border-radius: 4px;
+		    font-size: 16px;
+		    box-sizing: border-box;
+		}
+
+		input[readonly] {
+		    background-color: #f8f9fa;
+		}
+
+		label {
+		    display: block;
+		    margin-bottom: 8px;
+		    color: #666;
+		    font-weight: 500;
+		}
+
+		/* 반응형 디자인 */
+		@media (max-width: 768px) {
+		    .tab {
+		        padding: 10px 15px;
+		        font-size: 14px;
+		    }
+
+		    .order-buttons {
+		        grid-template-columns: 1fr;
+		    }
+
+		    .percentage-buttons {
+		        flex-wrap: wrap;
+		    }
+
+		    .percentage-buttons button {
+		        flex: 1 0 calc(50% - 5px);
+		    }
+		}
+	</style>
+</head>
+<body>
+	<nav class="navigation">
+	    <a href="createaccount.html">계좌 생성</a>
+	    <a href="accountlist.html">내 계좌</a>
+	    <a href="trading.html">거래하기</a>
+		<a href="investment.html">투자내역</a>
+	</nav>
+	
+	<!-- 계좌 선택 섹션 추가 -->
+	<div class="account-section">
+	    <div class="form-group">
+	        <label>계좌 선택</label>
+	        <select id="accountSelect" onchange="selectAccount()">
+	            <option value="">계좌를 선택하세요</option>
+	        </select>
+	    </div>
+	    
+	    <div id="accountInfo" style="display: none;" class="account-info">
+	        <div class="info-row">
+	            <span>보유 KRW</span>
+	            <span id="accountBalance">0 KRW</span>
+	        </div>
+	        <div class="info-row">
+	            <span>총 보유자산</span>
+	            <span id="totalAssets">0 KRW</span>
+	        </div>
+	        <div class="info-row">
+	            <span>총 수익률</span>
+	            <span id="totalProfitRate">0%</span>
+	        </div>
+	    </div>
+	</div>
+	
+	<!-- 주문 유형 탭 -->
+	<div class="tab-container">
+	    <div class="tab active" data-tab="buy">매수</div>
+	    <div class="tab" data-tab="sell">매도</div>
+	    <div class="tab" data-tab="pending">거래대기</div>
+	    <div class="tab" data-tab="history">거래내역</div>
+	</div>
+
+	<!-- 매수 섹션 -->
+	<div id="buySection" class="order-section">
+	    <!-- 주문 유형 선택 -->
+	    <div class="order-type-group">
+	        <label>주문유형</label>
+			<div class="radio-group">
+			    <label><input type="radio" name="buyOrderType" value="LIMIT" checked> 지정가</label>
+			    <label><input type="radio" name="buyOrderType" value="MARKET"> 시장가</label>
+			</div>
+	    </div>
+
+	    <!-- 코인 선택 -->
+		<!-- 매수 섹션의 코인 선택 -->
+		<div class="form-group">
+		    <label>코인 선택</label>
+		    <select id="buyCoinSymbol" class="coinSymbol" onchange="updateCurrentPrice()">
+		        <option value="">코인을 선택하세요</option>
+		    </select>
+		</div>
+		
+		<!-- 매수 섹션의 현재가 표시 -->
+		<div class="form-group">
+		    <label>현재가 (KRW)</label>
+		    <input type="text" id="buyCurrentPrice" readonly>
+		</div>
+
+	    <!-- 주문 가능 금액 -->
+		<div class="order-info-group">
+		    <label>주문가능</label>
+		    <div class="amount-display">
+		        <span id="buyAvailableAmount">0</span>  <!-- 매수 탭 -->
+		        <span class="unit">KRW</span>
+		    </div>
+		</div>
+
+
+
+	    <!-- 매수 가격 입력 -->
+		<!-- 매수 섹션의 주문가격 입력란 -->
+		<div id="buyLimitPriceGroup" class="price-group">
+		    <label>주문가격 (KRW)</label>
+		    <div class="price-input">
+		        <input type="text" id="buyOrderPrice" inputmode="numeric">
+				<div class="price-controls">
+				    <button type="button" onclick="adjustPrice('decrease', 'buy')" class="price-down">-</button>
+				    <button type="button" onclick="adjustPrice('increase', 'buy')" class="price-up">+</button>
+				</div>
+		    </div>
+		</div>
+
+		<!-- 매수 섹션의 주문 수량/금액 -->
+		<div class="quantity-group">
+		    <label>주문수량</label>
+		    <input type="text" id="buyOrderQuantity" inputmode="numeric" onchange="calculateOrderAmount()">
+		</div>
+
+		<!-- 매수 섹션의 주문총액 입력 -->
+		<div class="form-group">
+		    <label>주문총액 (KRW)</label>
+		    <input type="text" id="buyOrderAmount" inputmode="numeric" onchange="calculateQuantity()">
+		    <div class="percentage-buttons">
+		        <button type="button" onclick="setPercentage(10)">10%</button>
+		        <button type="button" onclick="setPercentage(25)">25%</button>
+		        <button type="button" onclick="setPercentage(50)">50%</button>
+		        <button type="button" onclick="setPercentage(100)">100%</button>
+		        <button type="button">직접입력</button>
+		    </div>
+		</div>
+		
+		
+
+	    <!-- 수수료 정보 -->
+	    <div class="fee-info">
+	        <span>최소주문금액: 5,000 KRW</span>
+	        <span>수수료(부가세 포함): 0.05%</span>
+	    </div>
+
+	    <!-- 주문 버튼 -->
+	    <div class="order-buttons">
+	        <button type="button" class="reset-button" onclick="resetForm()">초기화</button>
+	        <button type="button" class="order-button buy-button" onclick="processBuyOrder()">매수</button>
+	    </div>
+	</div>
+	
+	<!-- 매도 폼 -->
+	    <div id="sellSection" class="order-section" style="display: none;">
+	        <!-- 주문 유형 선택 -->
+	        <div class="order-type-group">
+	            <label>주문유형</label>
+				<div class="radio-group">
+				    <label><input type="radio" name="sellOrderType" value="LIMIT" checked> 지정가</label>
+				    <label><input type="radio" name="sellOrderType" value="MARKET"> 시장가</label>
+				</div>
+	        </div>
+			
+			<!-- 매도 섹션의 코인 선택 -->
+			<div class="form-group">
+			    <label>코인 선택</label>
+			    <select id="sellCoinSymbol" class="coinSymbol" onchange="updateCurrentPrice()">
+			        <option value="">코인을 선택하세요</option>
+			    </select>
+			</div>
+			
+			<!-- 매도 섹션의 현재가 표시 -->
+			<div class="form-group">
+			    <label>현재가 (KRW)</label>
+			    <input type="text" id="sellCurrentPrice" readonly>
+			</div>
+
+	        <!-- 주문 가능 금액 -->
+			<div class="order-info-group">
+			    <label>주문가능</label>
+			    <div class="amount-display">
+			        <span id="sellAvailableAmount">0</span>
+			        <span class="unit">KRW</span>
+			    </div>
+			</div>
+			
+			<div class="info-row">
+			    <span id="holdingQuantity" class="holding-info">보유: 0</span>
+			</div>
+
+	        <!-- 매수/매도 가격 입력 -->
+			
+			<!-- 매도 섹션의 주문가격 입력란 -->
+			<div id="sellLimitPriceGroup" class="price-group">
+			    <label>주문가격 (KRW)</label>
+			    <div class="price-input">
+			        <input type="text" id="sellOrderPrice" inputmode="numeric">
+					<div class="price-controls">
+					    <button type="button" onclick="adjustPrice('decrease', 'sell')" class="price-down">-</button>
+					    <button type="button" onclick="adjustPrice('increase', 'sell')" class="price-up">+</button>
+					</div>
+			    </div>
+			</div>
+
+	        <!-- 주문 수량 입력 -->
+			<!-- 매도 섹션의 주문 수량/금액 -->
+			<!-- 매도 섹션의 주문 수량 입력 부분 -->
+			<div class="quantity-group">
+			    <label>주문수량</label>
+			    <input type="text" id="sellOrderQuantity" inputmode="numeric" onchange="calculateOrderAmount()">
+			    <div class="percentage-buttons">
+			        <button type="button" onclick="setSellPercentage(10)">10%</button>
+			        <button type="button" onclick="setSellPercentage(25)">25%</button>
+			        <button type="button" onclick="setSellPercentage(50)">50%</button>
+			        <button type="button" onclick="setSellPercentage(100)">100%</button>
+			        <button type="button">직접입력</button>
+			    </div>
+			</div>
+
+			<!-- 매도 섹션의 주문총액 입력 -->
+			<div class="form-group">
+			    <label>주문총액 (KRW)</label>
+			    <input type="text" id="sellOrderAmount" inputmode="numeric" readonly>
+			</div>
+
+	        <!-- 수수료 정보 -->
+	        <div class="fee-info">
+	            <span>최소주문금액: 5,000 KRW</span>
+	            <span>수수료(부가세 포함): 0.05%</span>
+	        </div>
+
+	        <!-- 주문 버튼 -->
+			<div class="order-buttons">
+			    <button type="button" class="reset-button" onclick="resetForm()">초기화</button>
+			    <button type="button" class="order-button sell-button" onclick="processSellOrder()">매도</button>
+			</div>
+	    </div>
+
+
+		    <div id="pendingSection" class="order-section" style="display: none;">
+		        <table class="order-table">
+		            <thead>
+		                <tr>
+		                    <th>주문시간</th>
+		                    <th>코인</th>
+		                    <th>종류</th>
+		                    <th>주문가격</th>
+		                    <th>주문수량</th>
+		                    <th>주문총액</th>
+		                    <th>상태</th>
+		                    <th>취소</th>
+		                </tr>
+		            </thead>
+		            <tbody id="pendingOrdersList"></tbody>
+		        </table>
+		    </div>
+
+		    <!-- 거래내역 섹션 -->
+		    <div id="historySection" class="order-section" style="display: none;">
+		        <table class="order-table">
+		            <thead>
+		                <tr>
+		                    <th>체결시간</th>
+		                    <th>코인</th>
+		                    <th>종류</th>
+		                    <th>체결가격</th>
+		                    <th>체결수량</th>
+		                    <th>체결금액</th>
+		                </tr>
+		            </thead>
+		            <tbody id="orderHistoryList"></tbody>
+		        </table>
+		    </div>
+</body>
+<script>
+	// 전역 변수
+	// API 엔드포인트 상수 
+	// API 엔드포인트 상수 
+	const API_BASE_URL = '/api/accounts';
+	const API_TRANSACTION_URL = '/api/transactions';
+	const API_LIMIT_ORDER_URL = '/api/limit-orders';
+
+	// 전역 변수
+	let currentTab = 'buy';
+	let selectedAccount = null;
+	let priceUpdateInterval;
+	let holdingsUpdateInterval;
+
+	// 탭 전환 처리
+	document.querySelectorAll('.tab').forEach(tab => {
+	   tab.addEventListener('click', () => {
+	       switchTab(tab.dataset.tab);
+	   });
+	});
+
+	function switchTab(type) {
+	    // 모든 탭과 섹션 초기화
+	    document.querySelectorAll('.tab').forEach(tab => {
+	        tab.classList.remove('active');
+	    });
+	    document.querySelectorAll('.order-section').forEach(section => {
+	        section.style.display = 'none';
+	    });
+	    
+	    // 선택된 탭 활성화
+	    document.querySelector(`[data-tab="${type}"]`).classList.add('active');
+	    document.getElementById(`${type}Section`).style.display = 'block';
+	    
+	    currentTab = type;
+
+	    // 탭 전환 시 지정가 선택으로 초기화
+	    if (type === 'buy' || type === 'sell') {
+	        document.querySelector(`input[name="${type}OrderType"][value="LIMIT"]`).checked = true;
+	        togglePriceInput();
+	        resetForm();
+	        updateAvailableAmount();
+	        updateAllCoinPrices();
+	    } else if (type === 'pending') {
+	        loadPendingOrders(); 
+	    } else if (type === 'history') {
+	        loadOrderHistory();
+	    }
+	}
+	
+	// 계좌 관련 함수들
+	// loadAccounts 함수 수정
+	function loadAccounts() {
+	    // 테스트용 userId (나중에 로그인 구현 시 실제 userId로 변경)
+	    const userId = "testuser";  // 임시 테스트용 ID
+	    
+	    // API 호출
+	    axios.get(`/api/accounts/user/${userId}`)
+	        .then(response => {
+	            const accounts = response.data;
+	            const accountSelect = document.getElementById('accountSelect');
+	            accountSelect.innerHTML = '<option value="">계좌를 선택하세요</option>';
+	            
+	            accounts.forEach(account => {
+	                const option = document.createElement('option');
+	                option.value = account.id;
+	                option.textContent = `${account.accountNumber} (${account.balance.toLocaleString()} KRW)`;
+	                accountSelect.appendChild(option);
+	            });
+	        })
+	        .catch(error => {
+	            console.error('계좌 목록 로드 실패:', error);
+	            if (error.response) {
+	                console.error('에러 응답:', error.response.data);
+	            }
+	        });
+	}
+
+
+	let portfolio = [];  // 포트폴리오 정보 저장용 전역 변수 추가
+
+	async function selectAccount() {
+	    const accountId = document.getElementById('accountSelect').value;
+	    if (!accountId) {
+	        document.getElementById('accountInfo').style.display = 'none';
+	        selectedAccount = null;
+	        portfolio = [];
+	        return;
+	    }
+
+	    try {
+	        const accountResponse = await axios.get(`/api/accounts/${accountId}`);
+	        selectedAccount = accountResponse.data;
+	        
+	        const portfolioResponse = await axios.get(`/api/transactions/account/${accountId}/summary`);
+	        portfolio = portfolioResponse.data;  // 포트폴리오 정보 저장
+	        
+	        updateAccountInfo(selectedAccount, portfolio);
+	        document.getElementById('accountInfo').style.display = 'block';
+	    } catch (error) {
+	        console.error('계좌 정보 로드 실패:', error);
+	        alert('계좌 정보를 불러오는데 실패했습니다.');
+	    }
+	}
+	
+	function updateAccountInfo(account, portfolio) {
+	    try {
+	        // 총 보유자산 계산 (KRW + 코인 평가금액)
+	        const totalCoinValue = portfolio.reduce((sum, coin) => sum + coin.currentValue, 0);
+	        const totalAssets = account.balance + totalCoinValue;
+	        
+	        // 투자한도 및 가능 금액 계산
+	        const availableInvestment = account.investmentLimit - account.investmentAmount;
+	        
+	        // 화면 업데이트 (요소 존재 여부 확인)
+	        const accountBalanceElement = document.getElementById('accountBalance');
+	        const totalAssetsElement = document.getElementById('totalAssets');
+	        const availableAmountElement = document.getElementById(currentTab === 'buy' ? 'buyAvailableAmount' : 'sellAvailableAmount');
+	        const profitRateElement = document.getElementById('totalProfitRate');
+
+	        if (accountBalanceElement) {
+	            accountBalanceElement.textContent = `${account.balance.toLocaleString()} KRW`;
+	        }
+	        
+	        if (totalAssetsElement) {
+	            totalAssetsElement.textContent = `${totalAssets.toLocaleString()} KRW`;
+	        }
+	        
+	        if (availableAmountElement) {
+	            availableAmountElement.textContent = 
+	                `${Math.min(account.balance, availableInvestment).toLocaleString()}`;
+	        }
+	        
+	        // 수익률 계산 및 표시
+	        if (profitRateElement) {
+	            const totalInvestment = portfolio.reduce((sum, coin) => sum + coin.totalBuyAmount, 0);
+	            const totalProfit = totalCoinValue - totalInvestment;
+	            const profitRate = totalInvestment > 0 ? (totalProfit / totalInvestment) * 100 : 0;
+	            
+	            profitRateElement.textContent = profitRate >= 0 ? 
+	                `+${profitRate.toFixed(2)}%` : 
+	                `${profitRate.toFixed(2)}%`;
+	            profitRateElement.style.color = profitRate >= 0 ? '#c84a31' : '#1261c4';
+	        }
+	    } catch (error) {
+	        console.error('계좌 정보 업데이트 중 오류 발생:', error);
+	    }
+	}
+
+	// 코인 가격 정보 업데이트
+	// 코인 가격 정보 업데이트
+	async function updateAllCoinPrices() {
+	    try {
+	        // 마켓 코드 조회 (KRW 마켓만)
+	        const marketsResponse = await axios.get('https://api.upbit.com/v1/market/all', {
+	            params: {
+	                isDetails: 'true'
+	            }
+	        });
+	        const krwMarkets = marketsResponse.data.filter(market => market.market.startsWith('KRW-'));
+
+	        // 현재가 조회 (여러 코인 한번에)
+	        const marketCodes = krwMarkets.map(market => market.market).join(',');
+	        const pricesResponse = await axios.get('https://api.upbit.com/v1/ticker', {
+	            params: {
+	                markets: marketCodes
+	            }
+	        });
+
+	        // 현재가 정보 맵 생성
+	        const priceMap = {};
+	        pricesResponse.data.forEach(price => {
+	            const symbol = price.market.split('-')[1];
+	            priceMap[symbol] = price.trade_price;
+	        });
+
+	        // 마켓 정보와 가격 정보 결합
+	        const combinedData = krwMarkets.map(market => {
+	            const priceInfo = pricesResponse.data.find(price => price.market === market.market);
+	            return {
+	                market: market.market,
+	                korean_name: market.korean_name,
+	                english_name: market.english_name,
+	                trade_price: priceInfo ? priceInfo.trade_price : 0,
+	                signed_change_rate: priceInfo ? priceInfo.signed_change_rate : 0
+	            };
+	        });
+
+	        updateCoinDropdown(combinedData);
+	        
+	        const selectedCoin = document.getElementById(currentTab === 'buy' ? 'buyCoinSymbol' : 'sellCoinSymbol').value;
+	        if (selectedCoin) {
+	            updateCurrentPrice();
+	        }
+
+	        // 계좌가 선택되어 있을 때만 정보 업데이트
+	        if (selectedAccount && portfolio.length > 0) {
+	            // 포트폴리오의 현재가 업데이트
+	            portfolio = portfolio.map(coin => ({
+	                ...coin,
+	                currentPrice: priceMap[coin.coinSymbol] || coin.currentPrice,
+	                currentValue: (priceMap[coin.coinSymbol] || coin.currentPrice) * coin.totalQuantity
+	            }));
+
+	            // 계좌 정보 새로 가져오기
+	            const accountResponse = await axios.get(`/api/accounts/${selectedAccount.id}`);
+	            selectedAccount = accountResponse.data;
+
+	            // 화면 업데이트
+	            updateAccountInfo(selectedAccount, portfolio);
+	        }
+	    } catch (error) {
+	        console.error('코인 가격 조회 실패:', error);
+	    }
+	}
+
+
+	// 코인 목록 드롭다운 업데이트 
+	// 코인 목록 드롭다운 업데이트 
+	function updateCoinDropdown(prices) {
+	    const select = document.getElementById(currentTab === 'buy' ? 'buyCoinSymbol' : 'sellCoinSymbol');
+	    const currentValue = select.value;
+	    
+	    select.innerHTML = '<option value="">코인을 선택하세요</option>';
+	    
+	    prices.forEach(price => {
+	        // 매도 탭에서는 보유 중인 코인만 표시
+	        if (currentTab === 'sell') {
+	            const symbol = price.market.split('-')[1];
+	            const holding = portfolio.find(coin => coin.coinSymbol === symbol);
+	            if (!holding || holding.totalQuantity <= 0) return;
+	        }
+
+	        const option = document.createElement('option');
+	        option.value = price.market;
+	        const symbol = price.market.split('-')[1];
+	        const changePercent = (price.signed_change_rate * 100).toFixed(2);
+	        const changeColor = price.signed_change_rate > 0 ? 'color: #c84a31' : price.signed_change_rate < 0 ? 'color: #1261c4' : '';
+	        
+	        // 보유 수량 정보 추가 (매도 탭에서만)
+	        let holdingInfo = '';
+	        if (currentTab === 'sell') {
+	            const holding = portfolio.find(coin => coin.coinSymbol === symbol);
+	            if (holding) {
+	                holdingInfo = ` (보유: ${holding.totalQuantity.toFixed(8)})`;
+	            }
+	        }
+	        
+	        option.innerHTML = `${price.korean_name} - ${symbol}${holdingInfo} - ${price.trade_price.toLocaleString()} KRW <span style="${changeColor}">(${changePercent}%)</span>`;
+	        select.appendChild(option);
+	    });
+	    
+	    if (currentValue) {
+	        select.value = currentValue;
+	        updateCurrentPrice();
+	    }
+	}
+
+	// 현재가 업데이트
+	async function updateCurrentPrice() {
+	    // 선택된 코인이 없거나, input element가 없을 때는 함수 종료
+	    const symbolElement = document.getElementById(currentTab === 'buy' ? 'buyCoinSymbol' : 'sellCoinSymbol');
+	    if (!symbolElement || !symbolElement.value) {
+	        return;
+	    }
+	    
+	    const market = symbolElement.value;
+	    try {
+	        const response = await axios.get('https://api.upbit.com/v1/ticker', {
+	            params: {
+	                markets: market
+	            }
+	        });
+	        
+	        if (response.data && response.data[0]) {
+	            const price = response.data[0].trade_price;
+	            const currentPriceElement = document.getElementById(currentTab === 'buy' ? 'buyCurrentPrice' : 'sellCurrentPrice');
+	            if (currentPriceElement) {
+	                currentPriceElement.value = price.toLocaleString() + ' KRW';
+	                
+	                // 주문가격 업데이트도 element 존재 여부 체크
+	                const orderType = document.querySelector(`input[name="${currentTab}OrderType"]:checked`)?.value;
+	                const orderPriceElement = document.getElementById(currentTab === 'buy' ? 'buyOrderPrice' : 'sellOrderPrice');
+	                
+	                if (orderType === 'LIMIT' && orderPriceElement && (!orderPriceElement.value || orderPriceElement.value === '')) {
+	                    orderPriceElement.value = price.toLocaleString();
+	                }
+	            }
+	            
+	            calculateTotal();
+	        }
+	    } catch (error) {
+	        console.error('시세 조회 오류:', error);
+	        const currentPriceElement = document.getElementById(currentTab === 'buy' ? 'buyCurrentPrice' : 'sellCurrentPrice');
+	        if (currentPriceElement) {
+	            currentPriceElement.value = '시세 조회 실패';
+	        }
+	    }
+	}
+	
+	/**
+	* 주문 가능한 금액 또는 수량을 업데이트하는 함수
+	* - 매수: 계좌의 주문 가능 금액 표시
+	* - 매도: 선택한 코인의 주문 가능 금액 표시 (현재가 * 보유수량)
+	*/
+	function updateAvailableAmount() {
+	   if (!selectedAccount || !document.getElementById(currentTab === 'buy' ? 'buyCoinSymbol' : 'sellCoinSymbol').value) return;
+
+	   const amount = document.getElementById(currentTab === 'buy' ? 'buyAvailableAmount' : 'sellAvailableAmount');
+	   const unit = amount.nextElementSibling;
+	   
+	   if (currentTab === 'buy') {
+	       amount.textContent = selectedAccount.balance.toLocaleString();
+	       unit.textContent = 'KRW';
+	   } else {
+	       const coinSymbol = document.getElementById('sellCoinSymbol').value.split('-')[1];
+	       const holding = portfolio.find(coin => coin.coinSymbol === coinSymbol);
+	       
+	       if (holding) {
+	           const currentPrice = Number(document.getElementById('sellCurrentPrice').value.replace(/[^0-9]/g, ''));
+	           const availableAmount = holding.totalQuantity * currentPrice;
+	           amount.textContent = availableAmount.toLocaleString();
+	           unit.textContent = 'KRW';
+
+	           const quantityInfo = document.getElementById('holdingQuantity');
+	           if (quantityInfo) {
+	               quantityInfo.textContent = `보유: ${holding.totalQuantity.toFixed(8)} ${holding.coinSymbol}`;
+	           }
+	       } else {
+	           amount.textContent = '0';
+	           unit.textContent = 'KRW';
+	       }
+	   }
+	}
+
+	// 가격 업데이트 주기 설정 (1초)
+	document.addEventListener('DOMContentLoaded', () => {
+	    updateAllCoinPrices();
+	    setInterval(updateAllCoinPrices, 1000);
+	});
+
+	// 주문 유형에 따른 입력 필드 표시/숨김
+	function togglePriceInput() {
+	    const orderType = document.querySelector(`input[name="${currentTab}OrderType"]:checked`)?.value || 'LIMIT';
+	    const buyLimitPriceGroup = document.getElementById('buyLimitPriceGroup');
+	    const sellLimitPriceGroup = document.getElementById('sellLimitPriceGroup');
+	    
+	    if (currentTab === 'buy') {
+	        if (orderType === 'MARKET') {
+	            buyLimitPriceGroup.style.display = 'none';
+	        } else {
+	            buyLimitPriceGroup.style.display = 'block';
+	            const currentPrice = document.getElementById('buyCurrentPrice')?.value;
+	            if (currentPrice && currentPrice !== '시세 조회 실패') {
+	                document.getElementById('buyOrderPrice').value = currentPrice;
+	            }
+	        }
+	    } else {
+	        if (orderType === 'MARKET') {
+	            sellLimitPriceGroup.style.display = 'none';
+	        } else {
+	            sellLimitPriceGroup.style.display = 'block';
+	            const currentPrice = document.getElementById('sellCurrentPrice')?.value;
+	            if (currentPrice && currentPrice !== '시세 조회 실패') {
+	                document.getElementById('sellOrderPrice').value = currentPrice;
+	            }
+	        }
+	    }
+	    calculateTotal();
+	}
+	
+	// 가격 관련 함수들
+	function adjustPrice(direction, tab) {
+	   const input = document.getElementById(`${tab}OrderPrice`);
+	   let price = Number(input.value.replace(/[^0-9]/g, ''));
+	   const unit = calculatePriceUnit(price);
+	   
+	   if (direction === 'increase') {
+	       price += unit;
+	   } else {
+	       price = Math.max(0, price - unit);
+	   }
+	   
+	   input.value = price.toLocaleString();
+	   calculateTotal();
+	}
+
+	function calculatePriceUnit(price) {
+	   if (price >= 1000000) return 1000;
+	   if (price >= 100000) return 100;
+	   if (price >= 10000) return 50;
+	   return 10;
+	}
+
+	function setPercentage(percent) {
+	   if (!selectedAccount) return;
+	   
+	   const currentPrice = Number(document.getElementById(`${currentTab}CurrentPrice`).value.replace(/[^0-9]/g, ''));
+	   if (!currentPrice) {
+	       alert('현재가를 먼저 확인해주세요.');
+	       return;
+	   }
+
+	   // 현재 계좌 잔액의 percent%만큼 계산
+	   const available = Math.floor(selectedAccount.balance);  // 잔액을 정수로 변환
+	   const amount = Math.floor(available * (percent / 100));  // percent% 계산
+	   
+	   document.getElementById(`${currentTab}OrderAmount`).value = amount.toLocaleString();
+	   calculateQuantity();  // 수량은 주문총액/현재가로 자동 계산됨
+	}
+	
+
+	// setPercentage 함수 근처에 추가
+	function setSellPercentage(percent) {
+	    if (!selectedAccount || !document.getElementById('sellCoinSymbol').value) {
+	        alert('코인을 선택해주세요.');
+	        return;
+	    }
+	    
+	    const coinSymbol = document.getElementById('sellCoinSymbol').value.split('-')[1];
+	    const holding = portfolio.find(coin => coin.coinSymbol === coinSymbol);
+	    
+	    if (!holding) {
+	        alert('보유하지 않은 코인입니다.');
+	        return;
+	    }
+	    
+	    // 보유 수량의 percent% 계산
+	    const sellQuantity = holding.totalQuantity * (percent / 100);
+	    document.getElementById('sellOrderQuantity').value = sellQuantity.toFixed(8);
+	    
+	    // 주문총액 계산
+	    let currentPrice;
+	    if (document.querySelector('input[name="sellOrderType"]:checked').value === 'MARKET') {
+	        currentPrice = Number(document.getElementById('sellCurrentPrice').value.replace(/[^0-9]/g, ''));
+	    } else {
+	        currentPrice = Number(document.getElementById('sellOrderPrice').value.replace(/[^0-9]/g, ''));
+	    }
+	    
+	    const amount = Math.floor(sellQuantity * currentPrice);
+	    document.getElementById('sellOrderAmount').value = amount.toLocaleString();
+	}
+
+	function calculateTotal() {
+	    const orderType = document.querySelector(`input[name="${currentTab}OrderType"]:checked`).value;
+	    const quantity = Number(document.getElementById(currentTab === 'buy' ? 'buyOrderQuantity' : 'sellOrderQuantity').value);
+	    let price;
+
+	    if (orderType === 'MARKET') {
+	        price = Number(document.getElementById(currentTab === 'buy' ? 'buyCurrentPrice' : 'sellCurrentPrice').value.replace(/[^0-9]/g, ''));
+	    } else {
+	        price = Number(document.getElementById(currentTab === 'buy' ? 'buyOrderPrice' : 'sellOrderPrice').value.replace(/[^0-9]/g, ''));
+	    }
+	    
+	    if (price && quantity) {
+	        const total = price * quantity;
+	        document.getElementById(currentTab === 'buy' ? 'buyOrderAmount' : 'sellOrderAmount').value = total.toLocaleString();
+	    }
+	}
+	
+	// 주문총액 입력시 수량 계산
+	// 주문총액 입력시 수량 계산
+	function calculateQuantity() {
+	    const amountStr = document.getElementById(`${currentTab}OrderAmount`).value;
+	    const amount = Number(amountStr.replace(/[^0-9]/g, ''));
+	    let price = 0;
+	    
+	    if (document.querySelector(`input[name="${currentTab}OrderType"]:checked`).value === 'MARKET') {
+	        price = Number(document.getElementById(`${currentTab}CurrentPrice`).value.replace(/[^0-9]/g, ''));
+	    } else {
+	        price = Number(document.getElementById(`${currentTab}OrderPrice`).value.replace(/[^0-9]/g, ''));
+	    }
+	    
+	    if (price && amount) {
+	        const quantity = amount / price;
+	        document.getElementById(`${currentTab}OrderQuantity`).value = quantity.toFixed(8);
+	        
+	        // 금액 포맷팅만 진행하고 추가 계산은 하지 않음
+	        document.getElementById(`${currentTab}OrderAmount`).value = amount.toLocaleString();
+	    }
+	}
+
+	// 수량 입력시 주문총액 계산
+	// 수량 입력시 주문총액 계산
+	// 수량 입력시 주문총액 계산
+	function calculateOrderAmount() {
+	    const quantity = parseFloat(document.getElementById(`${currentTab}OrderQuantity`).value);
+	    let price = 0;
+	    
+	    if (document.querySelector(`input[name="${currentTab}OrderType"]:checked`).value === 'MARKET') {
+	        price = parseFloat(document.getElementById(`${currentTab}CurrentPrice`).value.replace(/[^0-9.]/g, ''));
+	    } else {
+	        price = parseFloat(document.getElementById(`${currentTab}OrderPrice`).value.replace(/[^0-9.]/g, ''));
+	    }
+	    
+	    if (quantity && price) {
+	        // 주문금액 계산 시 소수점 이하 버림
+	        const amount = Math.floor(quantity * price);
+	        document.getElementById(`${currentTab}OrderAmount`).value = amount.toLocaleString();
+	    }
+	}
+	
+	// 주문 처리 함수들
+	// validateOrder 함수 수정
+	function validateOrder() {
+	    if (!selectedAccount) {
+	        alert('계좌를 선택해주세요.');
+	        return false;
+	    }
+
+	    const market = document.getElementById(currentTab === 'buy' ? 'buyCoinSymbol' : 'sellCoinSymbol').value;
+	    if (!market) {
+	        alert('코인을 선택해주세요.');
+	        return false;
+	    }
+
+	    const quantity = parseFloat(document.getElementById(`${currentTab}OrderQuantity`).value);
+	    if (!quantity || quantity <= 0) {
+	        alert('주문 수량을 입력해주세요.');
+	        return false;
+	    }
+
+	    // 주문금액 계산
+	    const orderAmountStr = document.getElementById(`${currentTab}OrderAmount`).value;
+	    const orderAmount = parseFloat(orderAmountStr.replace(/[^0-9.]/g, ''));
+	    
+	    if (orderAmount < 5000) {
+	        alert('최소 주문금액은 5,000원입니다.');
+	        return false;
+	    }
+
+	    if (currentTab === 'buy') {
+	        const accountBalance = parseFloat(selectedAccount.balance);
+	        
+	        console.log('주문금액:', orderAmount.toLocaleString(), 'KRW');
+	        console.log('계좌잔액:', accountBalance.toLocaleString(), 'KRW');
+
+	        if (orderAmount > accountBalance) {
+	            alert('주문 금액이 계좌 잔액을 초과합니다.');
+	            return false;
+	        }
+
+	        // 투자한도 체크
+	        const investmentLimit = parseFloat(selectedAccount.investmentLimit);
+	        const investmentLimitAmount = accountBalance * (investmentLimit / 100);
+
+	        // 현재 코인의 보유금액 조회
+	        const coinSymbol = market.split('-')[1];
+	        const currentHolding = portfolio.find(coin => coin.coinSymbol === coinSymbol);
+	        const currentHoldingAmount = currentHolding ? 
+	            parseFloat(currentHolding.currentValue) : 0;
+
+	        // 주문 후 해당 코인의 총 투자금액
+	        const totalCoinInvestment = currentHoldingAmount + orderAmount;
+
+	        // 투자한도 초과 체크
+	        if (totalCoinInvestment > investmentLimitAmount) {
+	            if (!confirm(`해당 코인의 투자 비중이 ${investmentLimit}%를 초과합니다.\n계속 진행하시겠습니까?`)) {
+	                return false;
+	            }
+	        }
+	    }
+
+	    return true;
+	}
+
+	async function processBuyOrder() {
+	    if (!validateOrder()) return;
+
+	    try {
+	        const orderType = document.querySelector(`input[name="buyOrderType"]:checked`).value;
+	        const request = createOrderRequest('BUY');
+	        
+	        console.log('주문 요청 데이터:', request); // 디버깅용 로그
+	        
+	        const url = orderType === 'MARKET' ? API_TRANSACTION_URL : API_LIMIT_ORDER_URL;
+	        const response = await axios.post(url, request);
+	        
+	        alert(orderType === 'MARKET' ? '매수 주문이 체결되었습니다.' : 
+	            '매수 주문이 등록되었습니다. 지정가 도달 시 체결됩니다.');
+	            
+	        // 계좌 정보와 포트폴리오 정보 업데이트
+	        const accountResponse = await axios.get(`/api/accounts/${selectedAccount.id}`);
+	        selectedAccount = accountResponse.data;
+	        
+	        const portfolioResponse = await axios.get(`/api/transactions/account/${selectedAccount.id}/summary`);
+	        portfolio = portfolioResponse.data;
+	        
+	        updateAccountInfo(selectedAccount, portfolio);
+	        resetForm();
+	    } catch (error) {
+	        console.error('주문 요청 실패:', error.response?.data);
+	        handleOrderError(error);
+	    }
+	}
+
+	async function processSellOrder() {
+	    if (!validateOrder()) return;
+
+	    try {
+	        const orderType = document.querySelector(`input[name="${currentTab}OrderType"]:checked`).value;
+	        const request = createOrderRequest('SELL');
+	        
+	        const url = orderType === 'MARKET' ? API_TRANSACTION_URL : API_LIMIT_ORDER_URL;
+	        await axios.post(url, request);
+	        
+	        alert(orderType === 'MARKET' ? '매도 주문이 체결되었습니다.' : 
+	            '매도 주문이 등록되었습니다. 지정가 도달 시 체결됩니다.');
+	            
+	        // 계좌 정보와 포트폴리오 정보 새로 가져오기
+	        const accountResponse = await axios.get(`/api/accounts/${selectedAccount.id}`);
+	        selectedAccount = accountResponse.data;
+	        
+	        const portfolioResponse = await axios.get(`/api/transactions/account/${selectedAccount.id}/summary`);
+	        portfolio = portfolioResponse.data;
+	        
+	        // 화면 업데이트
+	        updateAccountInfo(selectedAccount, portfolio);
+	        resetForm();
+	    } catch (error) {
+	        handleOrderError(error);
+	    }
+	}
+
+	// 거래대기 목록과 거래내역
+	async function loadPendingOrders() {
+	    if (!selectedAccount) {
+	        console.log('선택된 계좌가 없습니다.');
+	        return;
+	    }
+	   
+	    try {
+	        const response = await axios.get(`${API_LIMIT_ORDER_URL}/account/${selectedAccount.id}`);
+	        console.log('거래대기 목록 응답:', response.data);
+	        
+	        if (Array.isArray(response.data)) {
+	            updatePendingOrdersList(response.data);
+	        } else {
+	            document.getElementById('pendingOrdersList').innerHTML = 
+	                '<tr><td colspan="8">거래대기 목록을 불러올 수 없습니다.</td></tr>';
+	        }
+	    } catch (error) {
+	        console.error('거래대기 목록 조회 실패:', error);
+	        document.getElementById('pendingOrdersList').innerHTML = 
+	            '<tr><td colspan="8">거래대기 목록을 불러오는 중 오류가 발생했습니다.</td></tr>';
+	    }
+	}
+
+	function updatePendingOrdersList(orders) {
+	    const tbody = document.getElementById('pendingOrdersList');
+	    if (!orders || orders.length === 0) {
+	        tbody.innerHTML = '<tr><td colspan="8">대기 중인 주문이 없습니다.</td></tr>';
+	        return;
+	    }
+
+	    tbody.innerHTML = orders.map(order => `
+	        <tr>
+	            <td>${formatDateTime(order.createdAt)}</td>
+	            <td>${order.coinSymbol}</td>
+	            <td>${order.type === 'BUY' ? '매수' : '매도'}</td>
+	            <td>${order.targetPrice.toLocaleString()}</td>
+	            <td>${order.quantity}</td>
+	            <td>${(Number(order.targetPrice) * Number(order.quantity)).toLocaleString()}</td>
+	            <td>${order.status === 'PENDING' ? '대기중' : 
+	                 order.status === 'COMPLETED' ? '체결완료' : '취소됨'}</td>
+	            <td>
+	                ${order.status === 'PENDING' ? 
+	                    `<button onclick="cancelOrder(${order.id})" class="cancel-button">취소</button>` : 
+	                    '-'}
+	            </td>
+	        </tr>
+	    `).join('');
+	}
+
+	async function loadOrderHistory() {
+	   if (!selectedAccount) return;
+	   
+	   try {
+	       const response = await axios.get(`${API_TRANSACTION_URL}/account/${selectedAccount.id}`);
+	       updateOrderHistoryList(response.data);
+	   } catch (error) {
+	       console.error('거래내역 조회 실패:', error);
+	   }
+	}
+
+	function updateOrderHistoryList(transactions) {
+	   const tbody = document.getElementById('orderHistoryList');
+	   tbody.innerHTML = transactions.map(tx => `
+	       <tr>
+	           <td>${formatDateTime(tx.transactionDateTime)}</td>
+	           <td>${tx.coinSymbol}</td>
+	           <td>${tx.type === 'BUY' ? '매수' : '매도'}</td>
+	           <td>${tx.price.toLocaleString()}</td>
+	           <td>${tx.quantity}</td>
+	           <td>${(tx.price * tx.quantity).toLocaleString()}</td>
+	       </tr>
+	   `).join('');
+	}
+
+	async function cancelOrder(orderId) {
+	    if (!confirm('주문을 취소하시겠습니까?')) return;
+	   
+	    try {
+	        console.log('주문 취소 요청:', orderId);
+	        await axios.delete(`${API_LIMIT_ORDER_URL}/${orderId}`);
+	        alert('주문이 취소되었습니다.');
+	        await loadPendingOrders();
+	    } catch (error) {
+	        console.error('주문 취소 실패:', error);
+	        
+	        let errorMessage = '주문 취소 중 오류가 발생했습니다.';
+	        if (error.response) {
+	            if (error.response.status === 404) {
+	                errorMessage = '취소할 주문을 찾을 수 없습니다.';
+	            } else if (error.response.status === 400) {
+	                errorMessage = '이미 처리된 주문입니다.';
+	            } else if (error.response.data && typeof error.response.data === 'string') {
+	                errorMessage = error.response.data;
+	            } else if (error.response.data && error.response.data.message) {
+	                errorMessage = error.response.data.message;
+	            }
+	        }
+	        
+	        alert(errorMessage);
+	    }
+	}
+
+	function formatDateTime(dateString) {
+	   const date = new Date(dateString);
+	   return date.toLocaleString('ko-KR');
+	}
+
+	// 초기화 및 이벤트 리스너
+	// 초기화 및 이벤트 리스너
+	document.addEventListener('DOMContentLoaded', () => {
+	    // 초기 탭 설정
+	    currentTab = 'buy';
+
+	    // 초기 주문유형 설정
+	    document.querySelector('input[name="buyOrderType"][value="LIMIT"]').checked = true;
+	    document.querySelector('input[name="sellOrderType"][value="LIMIT"]').checked = true;
+	    
+	    // 이벤트 리스너 등록
+	    document.querySelectorAll('input[name="buyOrderType"], input[name="sellOrderType"]').forEach(radio => {
+	        radio.addEventListener('change', togglePriceInput);
+	    });
+	    
+	    // buyCoinSymbol과 sellCoinSymbol 모두에 이벤트 리스너 추가
+	    const buyCoinSymbol = document.getElementById('buyCoinSymbol');
+	    const sellCoinSymbol = document.getElementById('sellCoinSymbol');
+	    
+	    if (buyCoinSymbol) {
+	        buyCoinSymbol.addEventListener('change', updateCurrentPrice);
+	    }
+	    if (sellCoinSymbol) {
+	        sellCoinSymbol.addEventListener('change', updateCurrentPrice);
+	    }
+	    
+	    // 수량과 금액 입력 이벤트 리스너
+	    const buyOrderQuantity = document.getElementById('buyOrderQuantity');
+	    const buyOrderAmount = document.getElementById('buyOrderAmount');
+	    
+	    if (buyOrderQuantity) {
+	        buyOrderQuantity.addEventListener('input', calculateOrderAmount);
+	    }
+	    if (buyOrderAmount) {
+	        buyOrderAmount.addEventListener('input', calculateQuantity);
+	    }
+		
+		// 매도 탭의 수량과 금액 입력 이벤트 리스너 추가
+	    const sellOrderQuantity = document.getElementById('sellOrderQuantity');
+	    const sellOrderAmount = document.getElementById('sellOrderAmount');
+	    
+	    if (sellOrderQuantity) {
+	        sellOrderQuantity.addEventListener('input', calculateOrderAmount);
+	    }
+	    if (sellOrderAmount) {
+	        sellOrderAmount.addEventListener('input', calculateQuantity);
+	    }
+	    
+	    // 초기 데이터 로드
+	    updateAllCoinPrices();
+	    
+	    // 가격 자동 업데이트 시작
+	    priceUpdateInterval = setInterval(updateAllCoinPrices, 1000);
+	    
+	    // 계좌 목록 로드
+	    loadAccounts();
+	    
+	    // 계좌 선택 이벤트 리스너 추가
+	    const accountSelect = document.getElementById('accountSelect');
+	    if (accountSelect) {
+	        accountSelect.addEventListener('change', selectAccount);
+	    }
+	});
+	
+	// 페이지 이탈 시 인터벌 정리
+	window.addEventListener('beforeunload', () => {
+	   if (priceUpdateInterval) clearInterval(priceUpdateInterval);
+	   if (holdingsUpdateInterval) clearInterval(holdingsUpdateInterval);
+	});
+	
+	// 주문 처리 에러 핸들링
+	// handleOrderError 함수도 수정
+	async function handleOrderError(error) {
+	    console.error('주문 처리 오류:', error);
+	    
+	    // 투자한도 초과 경고 처리
+	    if (error.response?.status === 409 && error.response.data?.warningType === 'INVESTMENT_LIMIT_EXCEEDED') {
+	        const shouldForce = confirm(error.response.data.message + '\n계속 진행하시겠습니까?');
+	        if (shouldForce) {
+	            try {
+	                const forceBuyRequest = {
+	                    accountId: selectedAccount.id,
+	                    coinSymbol: document.getElementById('buyCoinSymbol').value.split('-')[1],
+	                    price: document.getElementById('buyCurrentPrice').value.replace(/[^0-9.]/g, ''),
+	                    quantity: document.getElementById('buyOrderQuantity').value,
+	                    type: 'BUY'
+	                };
+
+	                // API 호출 전 요청 데이터 확인
+	                console.log('강제 매수 요청 데이터:', forceBuyRequest);
+	                
+	                const response = await axios.post(`${API_TRANSACTION_URL}/force`, forceBuyRequest);
+	                console.log('강제 매수 응답:', response);
+
+	                alert('강제 매수가 성공적으로 처리되었습니다.');
+	                await refreshAccountInfo();
+	                resetForm();
+	                return;
+	            } catch (forceBuyError) {
+	                console.error('강제 매수 실패:', forceBuyError.response?.data);
+	                alert('강제 매수 실패: ' + (forceBuyError.response?.data?.message || '알 수 없는 오류가 발생했습니다.'));
+	            }
+	        }
+	    }
+
+	    // 기타 오류 처리
+	    const errorMessage = error.response?.data?.message || '주문 처리 중 오류가 발생했습니다.';
+	    alert(errorMessage);
+	}
+	
+	async function refreshAccountInfo() {
+	    try {
+	        const accountResponse = await axios.get(`/api/accounts/${selectedAccount.id}`);
+	        selectedAccount = accountResponse.data;
+	        
+	        const portfolioResponse = await axios.get(`/api/transactions/account/${selectedAccount.id}/summary`);
+	        portfolio = portfolioResponse.data;
+	        
+	        updateAccountInfo(selectedAccount, portfolio);
+	    } catch (error) {
+	        console.error('계좌 정보 새로고침 실패:', error);
+	    }
+	}
+	
+
+	// 주문 데이터 생성
+
+	// 주문 데이터 생성
+	function createOrderRequest(type) {
+	    const market = document.getElementById(currentTab === 'buy' ? 'buyCoinSymbol' : 'sellCoinSymbol').value;
+	    const orderType = document.querySelector(`input[name="${currentTab}OrderType"]:checked`).value;
+	    const quantity = parseFloat(document.getElementById(`${currentTab}OrderQuantity`).value);
+	    
+	    // 지정가/시장가 구분에 따른 요청 객체 생성
+	    if (orderType === 'MARKET') {
+	        return {
+	            accountId: selectedAccount.id,
+	            coinSymbol: market.split('-')[1],
+	            amount: parseFloat(document.getElementById(`${currentTab}OrderAmount`).value.replace(/[^0-9]/g, '')),
+	            price: parseFloat(document.getElementById(`${currentTab}CurrentPrice`).value.replace(/[^0-9]/g, '')),
+	            quantity: quantity,
+	            type: type,
+	            marketPrice: true
+	        };
+	    } else {
+	        // 지정가 주문의 경우
+	        return {
+	            accountId: selectedAccount.id,
+	            coinSymbol: market.split('-')[1],
+	            targetPrice: parseFloat(document.getElementById(`${currentTab}OrderPrice`).value.replace(/[^0-9]/g, '')),
+	            quantity: quantity,
+	            type: type
+	        };
+	    }
+	}
+
+
+	// 폼 초기화
+	function resetForm() {
+	    if (currentTab === 'buy') {
+	        document.getElementById('buyOrderQuantity').value = '';
+	        document.getElementById('buyOrderAmount').value = '';
+	        document.getElementById('buyCoinSymbol').value = '';
+	        document.getElementById('buyCurrentPrice').value = '';
+	        document.getElementById('buyOrderPrice').value = '';
+	    } else if (currentTab === 'sell') {
+	        document.getElementById('sellOrderQuantity').value = '';
+	        document.getElementById('sellOrderAmount').value = '';
+	        document.getElementById('sellCoinSymbol').value = '';
+	        document.getElementById('sellCurrentPrice').value = '';
+	        document.getElementById('sellOrderPrice').value = '';
+	    }
+
+	    // 주문 유형 초기화 (지정가로)
+	    const orderTypeRadio = document.querySelector(`input[name="${currentTab}OrderType"][value="LIMIT"]`);
+	    if (orderTypeRadio) {
+	        orderTypeRadio.checked = true;
+	        togglePriceInput();
+	    }
+	}
+</script>
+</html>

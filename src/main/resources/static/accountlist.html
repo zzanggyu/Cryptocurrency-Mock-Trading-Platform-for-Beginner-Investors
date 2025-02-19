@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>내 계좌 | 가상자산 거래 시스템</title>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+   <style>
+	body {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		margin: 0;
+		padding: 20px;
+		background-color: #f5f5f5;
+	}
+
+       .navigation {
+           background-color: #EFDC05;
+           padding: 1rem;
+           margin-bottom: 2rem;
+       }
+
+       .navigation a {
+           color: white;
+           text-decoration: none;
+           padding: 0.5rem 1rem;
+           margin-right: 1rem;
+       }
+
+       .navigation a:hover {
+           background-color: #555;
+           border-radius: 4px;
+       }
+
+       .container {
+           max-width: 800px;
+           margin: 0 auto;
+           padding: 20px;
+       }
+
+       .search-section {
+           background-color: white;
+           padding: 1.5rem;
+           border-radius: 8px;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           margin-bottom: 2rem;
+       }
+
+       .search-form {
+           display: flex;
+           gap: 1rem;
+       }
+
+       .search-form input {
+           flex: 1;
+           padding: 0.75rem;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           font-size: 1rem;
+       }
+
+       .account-list {
+           display: grid;
+           gap: 1.5rem;
+       }
+
+       .account-card {
+           background-color: white;
+           padding: 1.5rem;
+           border-radius: 8px;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+       }
+
+       .account-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 1rem;
+           padding-bottom: 1rem;
+           border-bottom: 1px solid #eee;
+       }
+
+       .account-number {
+           font-size: 1.2rem;
+           font-weight: bold;
+           color: #333;
+       }
+
+       .investment-info {
+           background-color: #f8f9fa;
+           border-left: 4px solid #EFDC05;
+           padding: 1rem;
+           margin: 1rem 0;
+       }
+
+       .info-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 1rem;
+       }
+
+       .info-item {
+           margin: 0;
+       }
+
+       .info-label {
+           color: #666;
+           font-size: 0.9rem;
+       }
+
+       .info-value {
+           font-size: 1.1rem;
+           font-weight: bold;
+           color: #333;
+           margin-top: 0.25rem;
+       }
+
+       button {
+           background-color: #EFDC05;
+           color: white;
+           padding: 0.75rem 1rem;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+           font-size: 1rem;
+       }
+
+       button:hover {
+           background-color: #45a049;
+       }
+
+       .transaction-history {
+           margin-top: 1rem;
+           overflow-x: auto;
+       }
+
+       table {
+           width: 100%;
+           border-collapse: collapse;
+           margin-top: 0.5rem;
+       }
+
+       th, td {
+           padding: 0.75rem;
+           text-align: left;
+           border-bottom: 1px solid #ddd;
+       }
+
+       th {
+           background-color: #f5f5f5;
+           font-weight: bold;
+       }
+
+       .no-accounts {
+           text-align: center;
+           padding: 2rem;
+           background-color: white;
+           border-radius: 8px;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           color: #666;
+       }
+   </style>
+</head>
+<body>
+   <nav class="navigation">
+       <a href="createaccount.html">계좌 생성</a>
+       <a href="accountlist.html">내 계좌</a>
+       <a href="trading.html">거래하기</a>
+	   <a href="investment.html">투자내역</a>
+   </nav>
+
+   <div class="container">
+       <div class="search-section">
+           <h2>계좌 조회</h2>
+           <div class="search-form">
+               <input type="text" 
+                      id="searchUserId" 
+                      placeholder="사용자 ID를 입력하세요"
+                      pattern="^[a-zA-Z0-9]+$" 
+                      title="영문자와 숫자만 입력 가능합니다">
+               <button onclick="getAccountsByUserId()">조회</button>
+           </div>
+       </div>
+
+       <div id="accountsList" class="account-list">
+           <!-- 계좌 목록이 여기에 동적으로 추가됩니다 -->
+       </div>
+   </div>
+
+   <script>
+       const API_BASE_URL = '/api/accounts';
+       const API_TRANSACTION_URL = '/api/transactions';
+
+       async function getAccountsByUserId() {
+           try {
+               const userId = document.getElementById('searchUserId').value;
+               if (!userId) {
+                   alert('사용자 ID를 입력해주세요.');
+                   return;
+               }
+               if (!/^[a-zA-Z0-9]+$/.test(userId)) {
+                   alert('사용자 ID는 영문자와 숫자만 포함할 수 있습니다.');
+                   return;
+               }
+
+               const response = await axios.get(`${API_BASE_URL}/user/${userId}`);
+               displayAccounts(response.data);
+           } catch (error) {
+               console.error('에러 상세:', error);
+               alert('계좌 조회 중 오류가 발생했습니다: ' + (error.response?.data || error.message));
+               document.getElementById('accountsList').innerHTML = 
+                   '<div class="no-accounts">계좌를 찾을 수 없습니다.</div>';
+           }
+       }
+
+       function displayAccounts(accounts) {
+           const accountsList = document.getElementById('accountsList');
+           
+           if (!accounts || accounts.length === 0) {
+               accountsList.innerHTML = '<div class="no-accounts">조회된 계좌가 없습니다.</div>';
+               return;
+           }
+
+           accountsList.innerHTML = accounts.map(account => `
+               <div class="account-card">
+                   <div class="account-header">
+                       <span class="account-number">계좌번호: ${account.accountNumber}</span>
+                       <button onclick="getTransactionHistory(${account.id})">거래내역</button>
+                   </div>
+
+                   <div class="investment-info">
+                       <div class="info-grid">
+                           <div class="info-item">
+                               <div class="info-label">잔액</div>
+                               <div class="info-value">${account.balance.toLocaleString()} 원</div>
+                           </div>
+                           <div class="info-item">
+                               <div class="info-label">투자 한도</div>
+                               <div class="info-value">${account.investmentLimit.toLocaleString()} 원</div>
+                           </div>
+                           <div class="info-item">
+                               <div class="info-label">투자 비율</div>
+                               <div class="info-value">${getRiskPercentage(account.riskLevel)}%</div>
+                           </div>
+                           <div class="info-item">
+                               <div class="info-label">위험 수준</div>
+                               <div class="info-value">${getRiskLevelText(account.riskLevel)}</div>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div id="transaction-history-${account.id}"></div>
+               </div>
+           `).join('');
+       }
+
+       async function getTransactionHistory(accountId) {
+           try {
+               const response = await axios.get(`${API_TRANSACTION_URL}/account/${accountId}`);
+               const historyDiv = document.getElementById(`transaction-history-${accountId}`);
+               
+               if (!response.data || response.data.length === 0) {
+                   historyDiv.innerHTML = '<p style="text-align: center; color: #666;">거래내역이 없습니다.</p>';
+                   return;
+               }
+
+               historyDiv.innerHTML = `
+                   <div class="transaction-history">
+                       <table>
+                           <thead>
+                               <tr>
+                                   <th>날짜</th>
+                                   <th>코인</th>
+                                   <th>유형</th>
+                                   <th>수량</th>
+                                   <th>가격</th>
+                                   <th>금액</th>
+                               </tr>
+                           </thead>
+                           <tbody>
+                               ${response.data.map(t => `
+                                   <tr>
+                                       <td>${new Date(t.transactionDateTime).toLocaleString()}</td>
+                                       <td>${t.coinSymbol}</td>
+                                       <td>${t.type === 'BUY' ? '매수' : '매도'}</td>
+                                       <td>${t.quantity.toLocaleString()}</td>
+                                       <td>${t.price.toLocaleString()} 원</td>
+                                       <td>${t.amount.toLocaleString()} 원</td>
+                                   </tr>
+                               `).join('')}
+                           </tbody>
+                       </table>
+                   </div>
+               `;
+           } catch (error) {
+               console.error('Error:', error);
+               const historyDiv = document.getElementById(`transaction-history-${accountId}`);
+               historyDiv.innerHTML = '<p style="text-align: center; color: red;">거래내역 조회 중 오류가 발생했습니다.</p>';
+           }
+       }
+
+       function getRiskPercentage(riskLevel) {
+           const percentages = {
+               'CONSERVATIVE': 10,
+               'MODERATELY_CONSERVATIVE': 15,
+               'MODERATE': 20,
+               'MODERATELY_AGGRESSIVE': 25,
+               'AGGRESSIVE': 30
+           };
+           return percentages[riskLevel] || 0;
+       }
+
+       function getRiskLevelText(riskLevel) {
+           const riskLevelMap = {
+               'CONSERVATIVE': '보수적',
+               'MODERATELY_CONSERVATIVE': '약간 보수적',
+               'MODERATE': '보통',
+               'MODERATELY_AGGRESSIVE': '약간 공격적',
+               'AGGRESSIVE': '공격적'
+           };
+           return riskLevelMap[riskLevel] || riskLevel;
+       }
+   </script>
+</body>
+</html>

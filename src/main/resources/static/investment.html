@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투자내역 | 가상자산 거래 시스템</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .navigation {
+            background-color: #EFDC05;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin-right: 1rem;
+        }
+
+        .navigation a:hover {
+            background-color: #555;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .account-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .select-container {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .chart-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .holdings-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .holdings-table th,
+        .holdings-table td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+
+        .holdings-table th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .holdings-table td:first-child {
+            text-align: left;
+        }
+
+        .profit {
+            color: #c84a31;
+        }
+
+        .loss {
+            color: #1261c4;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .coin-name {
+            font-weight: 500;
+        }
+
+        .coin-symbol {
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navigation">
+        <a href="createaccount.html">계좌 생성</a>
+        <a href="accountlist.html">내 계좌</a>
+        <a href="trading.html">거래하기</a>
+		<a href="investment.html">투자내역</a>
+    </nav>
+
+    <div class="container">
+        <div class="account-section">
+            <div class="select-container">
+                <h2>계좌 선택</h2>
+                <select id="accountSelect" onchange="loadAccountData()">
+                    <option value="">계좌를 선택하세요</option>
+                </select>
+            </div>
+
+            <div id="accountInfo" class="hidden">
+                <h2>계좌 요약</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">보유 KRW</div>
+                        <div class="summary-value" id="balance">0 KRW</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">총 보유자산</div>
+                        <div class="summary-value" id="totalAssets">0 KRW</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">투자한도</div>
+                        <div class="summary-value" id="investmentLimit">0 KRW</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">현재 투자금액</div>
+                        <div class="summary-value" id="investmentAmount">0 KRW</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="holdingsSection" class="chart-section hidden">
+            <h2>투자 현황</h2>
+            <div class="chart-container">
+                <canvas id="portfolioChart"></canvas>
+            </div>
+
+            <table class="holdings-table">
+                <thead>
+                    <tr>
+                        <th>코인명</th>
+                        <th>보유수량</th>
+                        <th>평균매수가</th>
+                        <th>현재가</th>
+                        <th>총매수금액</th>
+                        <th>평가금액</th>
+                        <th>평가손익</th>
+                        <th>수익률</th>
+                    </tr>
+                </thead>
+                <tbody id="holdingsList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let portfolioChart = null;
+		let currentAccountId = null;
+		let priceUpdateInterval = null;
+
+
+        // 계좌 목록 로드
+        async function loadAccounts() {
+            try {
+                const userId = "testuser"; // 실제 구현시 로그인된 사용자 ID 사용
+                const response = await axios.get(`/api/accounts/user/${userId}`);
+                const accounts = response.data;
+                
+                const accountSelect = document.getElementById('accountSelect');
+                accountSelect.innerHTML = '<option value="">계좌를 선택하세요</option>';
+                
+                accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.accountNumber} (${account.balance.toLocaleString()} KRW)`;
+                    accountSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('계좌 목록 로드 실패:', error);
+                alert('계좌 목록을 불러오는데 실패했습니다.');
+            }
+        }
+
+        // 계좌 데이터 로드
+		// loadAccountData 함수 수정
+		async function loadAccountData() {
+		    const accountId = document.getElementById('accountSelect').value;
+		    
+		    // 계좌 선택이 해제된 경우
+		    if (!accountId) {
+		        currentAccountId = null;
+		        document.getElementById('accountInfo').classList.add('hidden');
+		        document.getElementById('holdingsSection').classList.add('hidden');
+		        if (priceUpdateInterval) {
+		            clearInterval(priceUpdateInterval);
+		            priceUpdateInterval = null;
+		        }
+		        return;
+		    }
+
+		    try {
+		        currentAccountId = accountId;
+		        await updateRealTimeData();  // 초기 데이터 로드
+
+		        // 이전 인터벌 clear 후 새로운 인터벌 설정
+		        if (priceUpdateInterval) {
+		            clearInterval(priceUpdateInterval);
+		        }
+		        priceUpdateInterval = setInterval(updateRealTimeData, 5000);
+
+		        document.getElementById('accountInfo').classList.remove('hidden');
+		        document.getElementById('holdingsSection').classList.remove('hidden');
+		    } catch (error) {
+		        console.error('데이터 로드 실패:', error);
+		        alert('데이터를 불러오는데 실패했습니다.');
+		    }
+		}
+		
+		
+		// 실시간 데이터 업데이트 함수
+		async function updateRealTimeData() {
+		    if (!currentAccountId) return;
+
+		    try {
+		        // 현재가 정보를 포함하여 데이터 로드
+		        const [accountResponse, holdingsResponse, marketsResponse] = await Promise.all([
+		            axios.get(`/api/accounts/${currentAccountId}`),
+		            axios.get(`/api/transactions/account/${currentAccountId}/summary`),
+		            axios.get('/api/upbit/markets')
+		        ]);
+
+		        const account = accountResponse.data;
+		        const holdings = holdingsResponse.data;
+		        const markets = marketsResponse.data;
+
+		        // 마켓 정보 추가
+		        holdings.forEach(holding => {
+		            holding.marketInfo = markets.find(market => 
+		                market.market === `KRW-${holding.coinSymbol}`
+		            );
+		        });
+
+		        // UI 업데이트
+		        updateAccountInfo(account, holdings);
+		        updateHoldings(holdings);
+		        createPortfolioChart(holdings);
+		    } catch (error) {
+		        console.error('실시간 데이터 업데이트 실패:', error);
+		    }
+		}
+
+        // 계좌 정보 업데이트
+		// 계좌 정보 업데이트 함수 수정
+		function updateAccountInfo(account, holdings = []) {
+		   document.getElementById('balance').textContent = `${account.balance.toLocaleString()} KRW`;
+		   document.getElementById('investmentLimit').textContent = `${account.investmentLimit.toLocaleString()} KRW`;
+		   document.getElementById('investmentAmount').textContent = `${account.investmentAmount.toLocaleString()} KRW`;
+		   
+		   // 총 보유자산 = 계좌 잔고 + 모든 코인의 현재 평가금액
+		   const totalCoinValue = holdings.reduce((sum, coin) => sum + coin.currentValue, 0);
+		   const totalAssets = account.balance + totalCoinValue;
+		   document.getElementById('totalAssets').textContent = `${Math.floor(totalAssets).toLocaleString()} KRW`;
+		}
+
+        // 보유종목 업데이트
+		function updateHoldings(holdings) {
+		    const holdingsList = document.getElementById('holdingsList');
+		    holdingsList.innerHTML = holdings.map(holding => {
+		        // 수익률 계산 수정
+		        const profitLoss = holding.currentValue - holding.totalBuyAmount;
+		        const profitLossRate = (profitLoss / holding.totalBuyAmount) * 100;
+
+		        return `
+		            <tr>
+		                <td>
+		                    <span class="coin-name">${holding.marketInfo ? holding.marketInfo.korean_name : holding.coinSymbol}</span>
+		                    <span class="coin-symbol">(${holding.coinSymbol})</span>
+		                </td>
+		                <td class="quantity-col">${holding.totalQuantity.toFixed(8)}</td>
+		                <td class="price-col">${Math.round(holding.avgBuyPrice).toLocaleString()} KRW</td>
+		                <td class="price-col">${Math.round(holding.currentPrice).toLocaleString()} KRW</td>
+		                <td class="amount-col">${Math.round(holding.totalBuyAmount).toLocaleString()} KRW</td>
+		                <td class="amount-col">${Math.round(holding.currentValue).toLocaleString()} KRW</td>
+		                <td class="amount-col ${profitLoss >= 0 ? 'profit' : 'loss'}">
+		                    ${Math.round(profitLoss).toLocaleString()} KRW
+		                </td>
+		                <td class="rate-col ${profitLoss >= 0 ? 'profit' : 'loss'}">
+		                    ${profitLossRate > 0 ? '+' : ''}${profitLossRate.toFixed(2)}%
+		                </td>
+		            </tr>
+		        `;
+		    }).join('');
+		}
+        // 포트폴리오 차트 생성
+		// 포트폴리오 차트 생성 함수 수정
+		function createPortfolioChart(holdings) {
+		    const ctx = document.getElementById('portfolioChart').getContext('2d');
+		    
+		    if (portfolioChart) {
+		        // 차트가 이미 존재하면 데이터만 업데이트
+		        portfolioChart.data.labels = holdings.map(h => 
+		            h.marketInfo ? `${h.marketInfo.korean_name} (${h.coinSymbol})` : h.coinSymbol
+		        );
+		        portfolioChart.data.datasets[0].data = holdings.map(h => h.currentValue);
+		        portfolioChart.update('none'); // 애니메이션 없이 업데이트
+		        return;
+		    }
+
+		    // 처음 차트 생성 시에만 실행
+		    portfolioChart = new Chart(ctx, {
+		        type: 'doughnut',
+		        data: {
+		            labels: holdings.map(h => 
+		                h.marketInfo ? `${h.marketInfo.korean_name} (${h.coinSymbol})` : h.coinSymbol
+		            ),
+		            datasets: [{
+		                data: holdings.map(h => h.currentValue),
+		                backgroundColor: [
+		                    '#FF6B6B',
+		                    '#4ECDC4',
+		                    '#45B7D1',
+		                    '#96CEB4',
+		                    '#FFEEAD'
+		                ]
+		            }]
+		        },
+		        options: {
+		            responsive: true,
+		            maintainAspectRatio: false,
+		            animation: {
+		                duration: 0 // 애니메이션 비활성화
+		            },
+		            plugins: {
+		                legend: {
+		                    position: 'right',
+		                    labels: {
+		                        font: {
+		                            size: 12
+		                        }
+		                    }
+		                },
+		                tooltip: {
+		                    callbacks: {
+		                        label: function(context) {
+		                            const value = context.raw;
+		                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+		                            const percentage = ((value / total) * 100).toFixed(1);
+		                            return `${context.label}: ${percentage}% (${value.toLocaleString()} KRW)`;
+		                        }
+		                    }
+		                }
+		            }
+		        }
+		    });
+		}
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', loadAccounts);
+		// 페이지 이탈 시 인터벌 정리
+		window.addEventListener('beforeunload', () => {
+		    if (priceUpdateInterval) {
+		        clearInterval(priceUpdateInterval);
+		    }
+		});
+    </script>
+</body>
+</html>
