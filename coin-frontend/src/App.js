@@ -10,6 +10,7 @@ import MarketIndex from './components/MarketIndex';
 import BoardList from './components/community/BoardList';
 import BoardWrite from './components/community/BoardWrite';
 import BoardDetail from './components/community/BoardDetail';
+import NewsList from './components/news/NewsList';
 import './App.css';
 
 function App() {
@@ -53,7 +54,7 @@ function App() {
                         <Link to="/" className="menu-item">거래소</Link>
                         <Link to="/" className="menu-item">입출금</Link>
                         <Link to="/" className="menu-item">투자내역</Link>
-                        <Link to="/" className="menu-item">코인동향</Link>
+                        <Link to="/trends" className="menu-item">코인동향</Link>
                         <Link to="/" className="menu-item">투자관리</Link>
                         <Link to="/" className="menu-item">고객센터</Link>
                         <Link to="/boards" className="menu-item">커뮤니티</Link>
@@ -82,6 +83,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<MarketIndex />} />
                     <Route path="/main" element={<MarketIndex />}/>
+					<Route path="/trends" element={<NewsList />} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/login" element={<Login setUser={setUser} />} />
                     <Route path="/mypage" element={<MyPage />} />

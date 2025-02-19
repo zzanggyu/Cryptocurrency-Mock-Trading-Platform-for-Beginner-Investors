@@ -1,32 +1,30 @@
-/* MarketIndex.css */
-
-.market-index-container {
+.market-container {
     padding: 20px;
     background: #f5f5f5;
 }
 
-.coin-list-wrapper, .news-wrapper {
+.market-section {
     background: white;
     border-radius: 10px;
     padding: 30px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-bottom: 20px; /* 섹션 간의 거리를 추가 */
+    margin-bottom: 20px;
 }
 
-.coin-list-wrapper h2, .news-wrapper h2 {
+.market-section-title {
     font-size: 22px;
     margin: 0;
     margin-bottom: 20px;
     color: #333;
 }
 
-.coin-list {
+.market-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 /* 테이블 헤더 스타일 */
-.coin-list thead th {
+.market-table-header {
     padding: 15px;
     text-align: right;
     color: #666;
@@ -34,40 +32,41 @@
     border-bottom: 2px solid #eee;
 }
 
-.coin-list thead th:first-child {
+.market-table-header:first-child {
     text-align: left;
 }
 
 /* 테이블 본문 스타일 */
-.coin-item td {
+.market-table-cell {
     padding: 15px;
     text-align: right;
     border-bottom: 1px solid #eee;
 }
 
-.coin-item:last-child td {
+.market-table-row:last-child .market-table-cell {
     border-bottom: none;
 }
 
-.coin-name {
+.market-coin-name {
     font-weight: 500;
     text-align: left !important;
 }
 
-.coin-price {
+.market-coin-price {
     font-weight: 500;
 }
 
-.coin-change {
+.market-coin-change {
     font-weight: 500;
 }
 
-.coin-volume, .coin-value {
+.market-coin-volume,
+.market-coin-value {
     color: #666;
 }
 
-.up { color: #c84a31; }
-.down { color: #1261c4; }
+.market-change-up { color: #c84a31; }
+.market-change-down { color: #1261c4; }
 
 .market-content {
     display: flex;
@@ -75,13 +74,13 @@
     gap: 20px;
 }
 
-.news-list {
+.market-news-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.news-item {
+.market-news-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -89,30 +88,30 @@
     border-bottom: 1px solid #eee;
 }
 
-.news-item:last-child {
+.market-news-item:last-child {
     border-bottom: none;
 }
 
-.news-item a {
+.market-news-link {
     color: #333;
     text-decoration: none;
     font-weight: 550;
     flex: 1;
     margin-right: 20px;
-    font-size: 18px; /* 글자 크기 조정 */
+    font-size: 18px;
 }
 
-.news-item a:hover {
+.market-news-link:hover {
     text-decoration: underline;
 }
 
-.news-date {
+.market-news-date {
     color: #666;
-    font-size: 1.1em; /* 날짜 글자 크기 조정 */
+    font-size: 1.1em;
     white-space: nowrap;
 }
 
-.news-thumbnail {
+.market-news-thumbnail {
     width: 120px;
     height: 80px;
     margin-right: 10px;

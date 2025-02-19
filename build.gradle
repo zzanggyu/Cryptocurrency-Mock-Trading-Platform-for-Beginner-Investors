@@ -42,6 +42,11 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api:3.0.0'
 	implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// JWT (json web token)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2' // or jjwt-gson, etc.
+	
     
 }
 

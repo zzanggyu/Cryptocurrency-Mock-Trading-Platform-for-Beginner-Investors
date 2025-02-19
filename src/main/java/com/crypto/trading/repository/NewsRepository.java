@@ -1,15 +1,13 @@
 package com.crypto.trading.repository;
 
-
+import com.crypto.trading.entity.News;
+import com.crypto.trading.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import com.crypto.trading.entity.News;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +25,17 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 		Page<News> findByCategoryAndKeyword(
 		    @Param("category") String category, 
 		    @Param("keyword") String keyword, 
+		    Pageable pageable
+		);
+	
+	@Query("SELECT n FROM News n JOIN n.favoriteUsers u " +
+		       "WHERE u = :user " +  // username 대신 user 객체 사용
+		       "AND (LOWER(n.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+		       "OR LOWER(n.content) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+		       "ORDER BY n.publishDate DESC")
+		Page<News> findByFavoriteUsersAndKeyword(
+		    @Param("user") User user,  // username 대신 User 객체로 변경
+		    @Param("keyword") String keyword,
 		    Pageable pageable
 		);
 	
@@ -74,6 +83,14 @@ public interface NewsRepository extends JpaRepository<News, Long> {
    Page<News> findByTitleContaining(String keyword, Pageable pageable);
    Page<News> findByCategoriesContaining(String category, Pageable pageable);
 
+   /**
+   * 사용자의 관심 뉴스 조회 (페이지네이션)
+   * @param user 사용자
+   * @param pageable 페이지 정보
+   * @return 관심 뉴스 목록
+   */
+   @Query("SELECT n FROM News n JOIN n.favoriteUsers u WHERE u = :user ORDER BY n.publishDate DESC")
+   Page<News> findByFavoriteUsers(@Param("user") User user, Pageable pageable);
 
    /**
    * URL로 뉴스 존재 여부 확인 (중복 체크용)

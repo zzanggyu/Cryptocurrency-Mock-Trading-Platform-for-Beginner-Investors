@@ -2,6 +2,10 @@ package com.crypto.trading.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,11 +46,11 @@ public class MarketController {
    @GetMapping("/market/news")
    public ResponseEntity<?> getLatestNews() {
        try {
-           List<News> newsList = newsService.getLatestNews();
-           System.out.println("뉴스 조회 결과: " + newsList);
-           return ResponseEntity.ok(newsList);
+           // 최신 뉴스 10개를 가져오도록 Pageable 설정
+           Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "publishDate"));
+           Page<News> newsPage = newsService.getAllNews(pageable);
+           return ResponseEntity.ok(newsPage.getContent());
        } catch (Exception e) {
-           System.out.println("News Error: " + e.getMessage());
            return ResponseEntity.badRequest().body("뉴스 조회 실패: " + e.getMessage());
        }
    }

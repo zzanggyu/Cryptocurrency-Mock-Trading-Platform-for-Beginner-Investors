@@ -65,52 +65,52 @@ function MarketIndex() {
         return names[market] || market;
     };
 
-    return (
-        <div className="market-index-container">
-            <div className="coin-list-wrapper">
-                <h2>실시간 시세</h2>
-                <table className="coin-list">
-                    <thead>
-                        <tr>
-                            <th>코인명</th>
-                            <th>현재가(KRW)</th>
-                            <th>변동률</th>
-                            <th>24시간 거래량</th>
-                            <th>24시간 거래대금</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {marketData.topCoins.map((coin, index) => (
-                            <tr key={index} className="coin-item">
-                                <td className="coin-name">{coin.name}</td>
-                                <td className="coin-price">{coin.price} 원</td>
-                                <td className={`coin-change ${coin.change === 'RISE' ? 'up' : 'down'}`}>
-                                    {coin.change === 'RISE' ? '+' : '-'}{Math.abs(coin.changeRate)}%
-                                </td>
-                                <td className="coin-volume">{coin.volume}</td>
-                                <td className="coin-value">{coin.value} 원</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="news-wrapper">
-                <h2>실시간 뉴스</h2>
-                <div className="news-list">
-                    {newsData.map((news) => (
-                        <div key={news.id} className="news-item">
-                            <a href={news.url} target="_blank" rel="noopener noreferrer">
-                                {news.title}
-                            </a>
-                            <span className="news-date">
-                                {new Date(news.publishDate).toLocaleString()}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
+	return (
+	    <div className="market-container">
+	        <div className="market-section">
+	            <h2 className="market-section-title">실시간 시세</h2>
+	            <table className="market-table">
+	                <thead>
+	                    <tr>
+	                        <th className="market-table-header">코인명</th>
+	                        <th className="market-table-header">현재가(KRW)</th>
+	                        <th className="market-table-header">변동률</th>
+	                        <th className="market-table-header">24시간 거래량</th>
+	                        <th className="market-table-header">24시간 거래대금</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    {marketData.topCoins.map((coin, index) => (
+	                        <tr key={index} className="market-table-row">
+	                            <td className="market-table-cell market-coin-name">{coin.name}</td>
+	                            <td className="market-table-cell market-coin-price">{coin.price} 원</td>
+	                            <td className={`market-table-cell market-coin-change ${coin.change === 'RISE' ? 'market-change-up' : 'market-change-down'}`}>
+	                                {coin.change === 'RISE' ? '+' : '-'}{Math.abs(coin.changeRate)}%
+	                            </td>
+	                            <td className="market-table-cell market-coin-volume">{coin.volume}</td>
+	                            <td className="market-table-cell market-coin-value">{coin.value} 원</td>
+	                        </tr>
+	                    ))}
+	                </tbody>
+	            </table>
+	        </div>
+	        <div className="market-section">
+	            <h2 className="market-section-title">실시간 뉴스</h2>
+	            <div className="market-news-list">
+	                {newsData.map((news) => (
+	                    <div key={news.id} className="market-news-item">
+	                        <a href={news.url} target="_blank" rel="noopener noreferrer" className="market-news-link">
+	                            {news.title}
+	                        </a>
+	                        <span className="market-news-date">
+	                            {new Date(news.publishDate).toLocaleString()}
+	                        </span>
+	                    </div>
+	                ))}
+	            </div>
+	        </div>
+	    </div>
+	);
 }
 
 export default MarketIndex;
