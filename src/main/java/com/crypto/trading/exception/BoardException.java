@@ -26,4 +26,6 @@ public class BoardException {
 	public static Comment validateComment(Optional<Comment> comment) {
 		return comment.orElseThrow(() -> new RuntimeException("댓글이 없습니다."));
 	}
+	
+	// 아아아ㅏ
 }
