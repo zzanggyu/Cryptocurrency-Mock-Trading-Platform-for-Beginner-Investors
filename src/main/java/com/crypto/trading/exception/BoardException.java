@@ -27,5 +27,5 @@ public class BoardException {
 		return comment.orElseThrow(() -> new RuntimeException("댓글이 없습니다."));
 	}
 	
-	// 아아아ㅏ
+	// 아아아ㅏdkdkdk
 }
