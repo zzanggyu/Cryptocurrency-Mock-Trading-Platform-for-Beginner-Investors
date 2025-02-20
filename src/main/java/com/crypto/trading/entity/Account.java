@@ -24,12 +24,15 @@ public class Account {
     @Column(nullable = false)
     private String accountNumber;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userid", nullable = false)
     private User user;
     
+//    @Column(nullable = false, precision = 20, scale = 8)
+//    private BigDecimal balance;
+    
     @Column(nullable = false, precision = 20, scale = 8)
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;  // 기본값 설정
     
     @Column(nullable = false)
     private BigDecimal investmentLimit;

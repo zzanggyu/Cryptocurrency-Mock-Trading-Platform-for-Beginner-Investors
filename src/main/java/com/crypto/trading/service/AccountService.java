@@ -40,26 +40,44 @@ public class AccountService {
    // 계좌 생성
    @Transactional
    public AccountResponse createAccount(AccountCreateRequest request) {
-       // userId 대신 username으로 사용자 찾기
-       User user = userRepository.findByUsername(request.getUserId())
-           .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
-       
        try {
+           // 1. 기본 검증
+           if (request.getInitialBalance() == null) {
+               throw new IllegalArgumentException("초기 잔액이 필요합니다.");
+           }
+
+           // 2. 사용자 찾기
+           User user = userRepository.findByUsername(request.getUserId())
+               .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+           // 3. 계좌 생성
            Account account = new Account();
            account.setAccountNumber(generateAccountNumber());
-           account.setUser(user); // User 엔티티 직접 설정
+           account.setUser(user);
            account.setBalance(request.getInitialBalance());
-           account.setRiskLevel(convertStyleToRiskLevel(user.getStyle())); // 사용자 스타일 기반으로 설정
+
+           // 4. RiskLevel 설정 (기본값 추가)
+           RiskLevel riskLevel = (user.getStyle() != null) ? 
+               convertStyleToRiskLevel(user.getStyle()) : 
+               RiskLevel.CONSERVATIVE;
+           account.setRiskLevel(riskLevel);
+
+           // 5. 투자 한도 계산 (null 체크 추가)
+           BigDecimal balance = request.getInitialBalance();
+           if (balance != null) {
+               BigDecimal investmentLimit = calculateInvestmentLimit(balance, riskLevel);
+               account.setInvestmentLimit(investmentLimit);
+           } else {
+               account.setInvestmentLimit(BigDecimal.ZERO);
+           }
            
-           BigDecimal investmentLimit = calculateInvestmentLimit(
-               request.getInitialBalance(), 
-               account.getRiskLevel()
-           );
-           account.setInvestmentLimit(investmentLimit);
+           // 6. 투자금액 초기화
            account.setInvestmentAmount(BigDecimal.ZERO);
-           
+
+           // 7. 저장 및 반환
            Account savedAccount = accountRepository.save(account);
            return convertToDto(savedAccount);
+
        } catch (Exception e) {
            throw new RuntimeException("계좌 생성 중 오류 발생: " + e.getMessage());
        }
