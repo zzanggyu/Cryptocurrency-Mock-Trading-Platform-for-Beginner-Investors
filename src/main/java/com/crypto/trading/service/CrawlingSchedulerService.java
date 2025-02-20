@@ -21,12 +21,7 @@ public class CrawlingSchedulerService {
     // 로깅을 위한 Logger 설정
     private static final Logger logger = LoggerFactory.getLogger(CrawlingSchedulerService.class);
     
-    /**
-     * 크롤러를 주기적으로 실행하는 스케줄 메소드
-     * fixedRate = 180000 : 3분(180,000밀리초)마다 실행
-     * 이전 실행이 끝나지 않았더라도 3분마다 새로 실행됨  ** 지금은 일단 15분으로 수정 900000
-     */ 
-    @Scheduled(fixedRate = 900000)
+    @Scheduled(fixedRate = 300000)
     public void runCrawler() {
         logger.info("크롤링 스케줄러 시작: {}", LocalDateTime.now());
         
