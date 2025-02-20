@@ -20,7 +20,7 @@ import lombok.Setter;
 public class UserFavorite {
 	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "userid")
+	@JoinColumn(name = "user_id")
 	private User user;
 	@Id
 	private String symbol;

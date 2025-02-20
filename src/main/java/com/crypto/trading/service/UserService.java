@@ -1,18 +1,20 @@
 package com.crypto.trading.service;
 
+import java.util.UUID;
+
 //import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.crypto.trading.config.BCryptEncoder;
-import com.crypto.trading.dto.AccountCreateRequest;
 import com.crypto.trading.dto.LoginRequestDTO;
 import com.crypto.trading.dto.PasswordChangeDTO;
 import com.crypto.trading.dto.SignupDTO;
 import com.crypto.trading.dto.StyleDTO;
 import com.crypto.trading.dto.UserResponseDTO;
 import com.crypto.trading.entity.Account;
+import com.crypto.trading.entity.Account.RiskLevel;
 import com.crypto.trading.entity.User;
 import com.crypto.trading.repository.AccountRepository;
 import com.crypto.trading.repository.UserRepository;
@@ -35,21 +37,39 @@ public class UserService {
         // 중복 검사
         validateDuplicateUser(signupDto);
 
-        // 사용자 엔티티 생성
+//        // 사용자 엔티티 생성
+//        User user = new User();
+//        user.setUsername(signupDto.getUsername());
+//        user.setNickname(signupDto.getNickname());
+//        user.setEmail(signupDto.getEmail());
+//        user.setPassword(bCryptEncoder.encode(signupDto.getPassword()));
+//        user.setStyle("CONSERVATIVE"); // 기본 투자 성향 설정
+//
+//        User savedUser = userRepository.save(user);
+//
+//        // AccountService를 통해 계좌 생성 
+//        AccountCreateRequest accountRequest = new AccountCreateRequest();
+//        accountRequest.setUserId(savedUser.getUsername());
+//        accountRequest.setInitialBalance(signupDto.getInitialBalance()); // 사용자 입력 초기 잔액 사용
+//        accountService.createAccount(accountRequest);
+//
+//        return UserResponseDTO.from(savedUser);
+        // 사용자 생성
         User user = new User();
         user.setUsername(signupDto.getUsername());
         user.setNickname(signupDto.getNickname());
         user.setEmail(signupDto.getEmail());
         user.setPassword(bCryptEncoder.encode(signupDto.getPassword()));
-        user.setStyle("CONSERVATIVE"); // 기본 투자 성향 설정
-
+        user.setStyle("CONSERVATIVE"); // 기본 투자 성향
+        
         User savedUser = userRepository.save(user);
 
-        // AccountService를 통해 계좌 생성 
-        AccountCreateRequest accountRequest = new AccountCreateRequest();
-        accountRequest.setUserId(savedUser.getUsername());
-        accountRequest.setInitialBalance(signupDto.getInitialBalance()); // 사용자 입력 초기 잔액 사용
-        accountService.createAccount(accountRequest);
+        // 계좌 생성 - 기본값 사용
+        Account account = new Account();
+        account.setUser(savedUser);
+        account.setAccountNumber(UUID.randomUUID().toString().substring(0, 10));
+        account.setRiskLevel(RiskLevel.CONSERVATIVE);
+        accountRepository.save(account);
 
         return UserResponseDTO.from(savedUser);
     }

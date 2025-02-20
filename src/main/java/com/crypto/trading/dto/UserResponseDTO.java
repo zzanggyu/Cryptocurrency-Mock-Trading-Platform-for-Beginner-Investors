@@ -16,7 +16,7 @@ public class UserResponseDTO {
 
     public static UserResponseDTO from(User user) {
         UserResponseDTO dto = new UserResponseDTO();
-        dto.setUserId(user.getUserid());
+        dto.setUserId(user.getUserId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setStyle(user.getStyle());

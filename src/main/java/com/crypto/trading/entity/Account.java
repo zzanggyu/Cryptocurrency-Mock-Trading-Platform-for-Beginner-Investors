@@ -17,37 +17,32 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false)
+
+    @Column(nullable = false, unique = true)
     private String accountNumber;
-    
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userid", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
-//    @Column(nullable = false, precision = 20, scale = 8)
-//    private BigDecimal balance;
-    
+
     @Column(nullable = false, precision = 20, scale = 8)
-    private BigDecimal balance = BigDecimal.ZERO;  // 기본값 설정
-    
-    @Column(nullable = false)
-    private BigDecimal investmentLimit;
-    
-    @Column(nullable = false)
-    private BigDecimal investmentAmount;
-    
-    // 수익률 추가
+    private BigDecimal balance = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 20, scale = 8)
+    private BigDecimal investmentLimit = BigDecimal.ZERO;  // 기본값 설정
+
+    @Column(nullable = false, precision = 20, scale = 8)
+    private BigDecimal investmentAmount = BigDecimal.ZERO; // 기본값 설정
+
     @Column(name = "profit_rate", precision = 20, scale = 8)
-    private BigDecimal profitRate;
-    
+    private BigDecimal profitRate = BigDecimal.ZERO;       // 기본값 설정
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RiskLevel riskLevel;
-    
+    private RiskLevel riskLevel = RiskLevel.CONSERVATIVE;  // 기본값 설정
     @OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Transaction> transactions = new ArrayList<>();
     
