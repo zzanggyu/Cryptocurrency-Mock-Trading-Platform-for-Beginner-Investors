@@ -1,7 +1,6 @@
 package com.crypto.trading.config;
 
 import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -18,24 +18,35 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // CORS 설정
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // CSRF 비활성화
             .csrf(csrf -> csrf.disable())
+            // 세션 관리 설정
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
+            // 요청 권한 설정
             .authorizeHttpRequests(authz -> authz
-                // 인증 없이 접근 가능한 엔드포인트
                 .requestMatchers(
                     "/api/signup", 
                     "/api/login", 
                     "/api/market/ticker",
-                    "/api/news/**",         // 뉴스 관련 엔드포인트 추가
-                    "/api/all-data/**",     // 시장 데이터 관련 추가
-                    "/api/assets/**",       // 자산 정보 관련 추가
-                    "/api/markets/**"       // 마켓 데이터 관련 추가
+                    "/api/news/**",
+                    "/api/all-data/**",
+                    "/api/assets/**",
+                    "/api/markets/**",
+                    "/api/coins/**",        // 코인 정보 접근 허용
+                    "/api/upbit/**"         // Upbit API 접근 허용
                 ).permitAll()
-                // 나머지 /api/** 경로는 인증 필요
                 .requestMatchers("/api/**").authenticated()
-                // 그 외 모든 요청 허용
                 .anyRequest().permitAll()
-            );
+            )
+            // 폼 로그인 비활성화
+            .formLogin(formLogin -> formLogin.disable())
+            // HTTP Basic 인증 비활성화
+            .httpBasic(httpBasic -> httpBasic.disable());
+
         return http.build();
     }
 
@@ -43,9 +54,22 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "Accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList(
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Credentials"
+        ));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

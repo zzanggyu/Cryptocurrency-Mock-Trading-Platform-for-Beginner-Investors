@@ -1,7 +1,6 @@
 package com.crypto.trading.service;
 
-import java.math.BigDecimal;
-import java.util.List;
+//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +18,12 @@ import com.crypto.trading.repository.AccountRepository;
 import com.crypto.trading.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserService {
     
     private final UserRepository userRepository;
@@ -54,15 +55,23 @@ public class UserService {
     }
 
     public UserResponseDTO login(LoginRequestDTO loginDto) {
+        log.info("로그인 처리 시작 - 사용자명: {}", loginDto.getUsername());
+        
         User user = userRepository.findByUsername(loginDto.getUsername())
-            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> {
+                log.error("사용자 조회 실패 - 사용자명: {}", loginDto.getUsername());
+                return new RuntimeException("사용자를 찾을 수 없습니다.");
+            });
 
+        log.info("사용자 조회 성공 - 사용자명: {}", user.getUsername());
+        
         if (!bCryptEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            log.error("비밀번호 불일치 - 사용자명: {}", loginDto.getUsername());
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
+        log.info("비밀번호 검증 성공 - 사용자명: {}", user.getUsername());
         return UserResponseDTO.from(user);
-        
     }
     
     private void validateDuplicateUser(SignupDTO signupDto) {

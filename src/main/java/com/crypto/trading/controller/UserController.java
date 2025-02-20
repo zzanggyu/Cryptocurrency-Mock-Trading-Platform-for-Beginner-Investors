@@ -1,5 +1,7 @@
 package com.crypto.trading.controller;
 
+//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -21,10 +23,12 @@ import com.crypto.trading.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
@@ -42,22 +46,23 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginDto, HttpSession session) {
         try {
+            log.info("로그인 시도 - 사용자명: {}", loginDto.getUsername());
             UserResponseDTO user = userService.login(loginDto);
-            // 세션에 사용자 정보 저장 전 로그
-            System.out.println("로그인 시도 사용자: " + user.getUsername());
+            log.info("로그인 성공 - 사용자명: {}", user.getUsername());
             
-            // 세션에 사용자 정보 저장
+            // 세션 저장 전 로그
+            log.info("세션에 사용자 정보 저장 시도");
             session.setAttribute("LOGGED_IN_USER", user);
-            
-            // 세션 저장 후 확인 로그
-            System.out.println("세션 ID (로그인): " + session.getId());
-            System.out.println("세션에 저장된 사용자: " + ((UserResponseDTO)session.getAttribute("LOGGED_IN_USER")).getUsername());
+            log.info("세션 ID: {}", session.getId());
             
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
+            log.error("로그인 실패 - 사용자명: {}, 에러 메시지: {}", loginDto.getUsername(), e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    
+
     
     @GetMapping("/user/info")
     public ResponseEntity<?> getUserInfo(HttpSession session) {
