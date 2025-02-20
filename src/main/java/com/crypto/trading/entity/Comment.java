@@ -30,7 +30,7 @@ public class Comment {
 	private Board board;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "userid")
 	private User user;
 	
 	private LocalDateTime createdAt;

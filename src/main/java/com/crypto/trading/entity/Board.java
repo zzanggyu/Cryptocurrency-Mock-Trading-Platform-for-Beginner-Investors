@@ -36,7 +36,7 @@ public class Board {
 	private String content;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)  // user_id 컬럼 설정
+    @JoinColumn(name = "userid", nullable = false)  // user_id 컬럼 설정
     private User user;
 	
 	private int viewCount;
