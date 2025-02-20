@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import LoginModal from './LoginModal';
 import './Navigation.css';
 
 const Navigation = ({ activeTab, setActiveTab }) => {
@@ -96,13 +95,6 @@ const Navigation = ({ activeTab, setActiveTab }) => {
                     </div>
                 </div>
             </div>
-            
-            <LoginModal 
-                isOpen={isLoginOpen} 
-                onClose={() => setIsLoginOpen(false)}
-                initialIsSignup={isSignupMode}
-                onLoginSuccess={handleLoginSuccess}
-            />
         </nav>
     );
 };

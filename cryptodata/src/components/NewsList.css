@@ -11,6 +11,11 @@
 
 .main-section {
     flex: 1;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    
 }
 
 /* 검색 섹션 */
@@ -132,15 +137,18 @@
 /* 뉴스 컨테이너 */
 .news-container {
     background: white;
+    height: max-content;
 }
 
 .news-scroll {
     height: calc(100vh - 200px);
     overflow-y: auto;
+    flex: 1; 
 }
 
 .news-list {
     border-top: 1px solid #e5e7eb;
+    height: 100%; 
 }
 
 .news-list > * {

@@ -46,7 +46,6 @@ def get_market_data(driver):
            cols = row.find_elements(By.TAG_NAME, "td")
            if len(cols) >= 4:
                market_data_list.append({
-                   "id": idx,  # id 직접 지정
                    "rank": cols[0].text.strip(),
                    "name": cols[1].text.strip(),
                    "marketcap": cols[2].text.strip(),
