@@ -1,0 +1,59 @@
+.survey-container {
+    min-height: calc(100vh - 64px);
+    background-color: #f5f5f5;
+    padding: 2rem;
+}
+
+.survey-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;  /* 더 진한 색상으로 변경 */
+    font-weight: bold;
+}
+
+.category {
+    color: #1e88e5;  /* 더 진한 파란색으로 변경 */
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.question {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    color: #333;  /* 텍스트 색상 추가 */
+    font-weight: bold;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-button {
+    padding: 1rem;
+    border: 2px solid #ddd;  /* 테두리 두께 증가 */
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #333;  /* 텍스트 색상 추가 */
+    font-size: 1rem;
+    text-align: left;  /* 텍스트 왼쪽 정렬 */
+}
+
+.option-button:hover {
+    background-color: #1e88e5;  /* 더 진한 파란색으로 변경 */
+    color: white;
+    border-color: #1e88e5;
+}
