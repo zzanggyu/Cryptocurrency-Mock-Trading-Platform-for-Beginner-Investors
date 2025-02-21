@@ -1,6 +1,6 @@
 package com.crypto.trading.config;
 
-import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 //BCryptEncoder.java - 비밀번호 암호화를 위한 컴포넌트

@@ -34,9 +34,18 @@ public class CommentService {
        return dto;
    }
    
+   // 댓글 내용 검사
+   private void validateCommentContent(String content) {
+	   if(content == null || content.trim().isEmpty()) {
+		   throw new RuntimeException("댓글 내용을 입력해주세요");
+	   }
+   }
+   
    // 새 댓글 작성
    @Transactional
    public CommentDTO createComment(Long boardId, CommentDTO commentDto, HttpSession session) {
+	   validateCommentContent(commentDto.getContent());
+	   
        // 게시글 존재 여부 확인
        Board board = BoardException.validateBoard(boardRepository.findById(boardId));
        // 현재 로그인한 사용자 정보 가져오기

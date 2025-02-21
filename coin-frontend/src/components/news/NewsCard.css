@@ -1,36 +1,36 @@
-.newscard {
+.news-card {
     border-bottom: 1px solid #e5e7eb;
     padding: 1rem 0;
 }
 
-.newscard-content {
+.news-card-content {
     display: flex;
     gap: 1rem;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
-.newscard-content:hover {
+.news-card-content:hover {
     background-color: #f9fafb;
 }
 
-.newscard-image {
+.news-card-image {
     flex-shrink: 0;
 }
 
-.newscard-image img {
+.news-image {
     width: 8rem;
     height: 6rem;
     object-fit: cover;
     border-radius: 0.5rem;
 }
 
-.newscard-details {
+.news-card-details {
     flex-grow: 1;
     position: relative;
 }
 
-.newscard-favorite {
+.favorite-icon {
     width: 1rem;
     height: 1rem;
     position: absolute;
@@ -40,40 +40,39 @@
     transition: color 0.2s;
 }
 
-.newscard-favorite.active {
+.favorite-icon.favorited {
     color: #fbbf24;
 }
 
-.newscard-favorite.inactive {
+.favorite-icon:not(.favorited) {
     color: #d1d5db;
 }
 
-.newscard-meta {
+.news-meta {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.25rem;
 }
 
-.newscard-category,
-.newscard-date {
+.category, .publish-date {
     font-size: 0.75rem;
     color: #6b7280;
 }
 
-.newscard-separator {
+.separator {
     color: #9ca3af;
     font-size: 0.75rem;
 }
 
-.newscard-title {
+.news-title {
     font-size: 1rem;
     font-weight: bold;
     color: #111827;
     margin-bottom: 0.25rem;
 }
 
-.newscard-content {
+.news-content {
     font-size: 0.875rem;
     color: #6b7280;
     display: -webkit-box;
@@ -82,7 +81,7 @@
     overflow: hidden;
 }
 
-.newscard-keywords {
+.news-keywords {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -90,20 +89,20 @@
     padding: 0 1rem;
 }
 
-.newscard-author {
-    background-color: #3b82f6;
+.author-tag {
+    background-color: #87CEEB;
     color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 9999px;
     font-size: 0.75rem;
 }
 
-.newscard-tags {
+.keywords-list {
     display: flex;
     gap: 0.5rem;
 }
 
-.newscard-tag {
+.keyword {
     background-color: #f3f4f6;
     color: #4b5563;
     padding: 0.25rem 0.5rem;
@@ -113,11 +112,11 @@
     transition: background-color 0.2s;
 }
 
-.newscard-tag:hover {
+.keyword:hover {
     background-color: #e5e7eb;
 }
 
-.newscard-tag-more {
+.remaining-keywords {
     color: #6b7280;
     font-size: 0.75rem;
 }

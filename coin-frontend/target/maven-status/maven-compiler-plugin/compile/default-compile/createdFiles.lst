@@ -1,0 +1,5 @@
+com/crypto/dto/PasswordChangeDTO.class
+com/crypto/entity/Comment.class
+com/crypto/entity/User.class
+com/crypto/entity/VirtualAccount.class
+com/crypto/entity/Board.class

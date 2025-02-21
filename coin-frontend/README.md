@@ -1,70 +1,107 @@
-# Getting Started with Create React App
+# React Example for Upbit API
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is **React Example Code for Upbit API.** This project started for beginner using Upbit API.
 
-## Available Scripts
+If you want to **visualize Real-time stream data of history data of upbit crypto,** you can use this sample codes with your project.
 
-In the project directory, you can run:
+## Using npm Library!!!!
 
-### `npm start`
+This Project is based on `use-upbit-api` npm library, which is react custom hooks for upbit api.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+You can see the details in [here](https://www.npmjs.com/package/use-upbit-api).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**This Custom Hook makes you free to control troubles in upbit websocket API.**
 
-### `npm test`
+## TOTAL Demo
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![TOTALEXAMPLE](https://user-images.githubusercontent.com/44657722/183570075-cb54905c-a57c-44a6-96c3-3d66dccef054.gif)
 
-### `npm run build`
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/total-example)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/tree/master/src/QuotationAPI/TOTAL-example)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## REST API
 
-### `npm run eject`
+### **getMarketCode**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+![RESTAPI_getMarketCode](https://user-images.githubusercontent.com/44657722/183568760-fb58e603-ab00-41bd-842e-2d2ae4f3a350.gif)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/rest-api/marketcode)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/RESTAPI-example/MarketCode.js)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+### **MinuteCandleData**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+![RESTAPI_MinuteCandleData](https://user-images.githubusercontent.com/44657722/183569283-703b55ae-ee01-4671-bfbf-7dbacd85add1.gif)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/rest-api/minute-candle-data)
 
-### Code Splitting
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/RESTAPI-example/MinuteCandleData.js)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+### **DayCandleData**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+![RESTAPI_DayCandleData](https://user-images.githubusercontent.com/44657722/183568878-0fc4d49e-ba51-49f3-bb9f-582d19047f82.gif)
 
-### Making a Progressive Web App
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/rest-api/day-candle-data)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/RESTAPI-example/DayCandleData.js)
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### **WeekMonthCandleData**
 
-### Deployment
+![RESTAPI_WeekMonthCandleData](https://user-images.githubusercontent.com/44657722/183569438-522b2d25-61d5-44d0-9422-78c1f4e5115c.gif)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/rest-api/week-month-candle-data)
 
-### `npm run build` fails to minify
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/RESTAPI-example/WeekMonthCandleData.js)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+### **TradeHistoryData**
+
+![RESTAPI_TradeHistoryData](https://user-images.githubusercontent.com/44657722/183569535-d48bd941-b768-4654-ac68-952e01f9636d.gif)
+
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/rest-api/trade-history-data)
+
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/RESTAPI-example/TradeHistoryData.js)
+
+---
+
+## WEBSOCKET API
+
+### **Orderbook**
+
+![WEBSOCKETAPI_Orderbook](https://user-images.githubusercontent.com/44657722/183569807-bdd58ba4-10e0-48b7-92e1-f463c54810d0.gif)
+
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/websocket-api/order-book)
+
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/WEBSOCKET-example/OrderBook.js)
+
+---
+
+### **RealTimePrice**
+
+![WEBSOCKETAPI_RealTimePrice](https://user-images.githubusercontent.com/44657722/183569903-2f3bd599-10f3-4290-b1f5-7b9dc16829f1.gif)
+
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/websocket-api/real-time-price)
+
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/WEBSOCKET-example/RealTimePrice.js)
+
+---
+
+### **TradeHistory**
+
+![WEBSOCKETAPI_TradeHistory](https://user-images.githubusercontent.com/44657722/183570008-2196f61e-ee08-4cfc-802d-a197c2ff230a.gif)
+
+**_View Demo_** [here](https://devkangminhyeok.github.io/React-Upbit-API-Example/websocket-api/trade-history)
+
+**_View Code_** [here](https://github.com/devKangMinHyeok/React-Upbit-API-Example/blob/master/src/QuotationAPI/WEBSOCKET-example/TradeHistory.js)
+
+---

@@ -1,0 +1,212 @@
+/* src/styles/AccountList.css */
+.navbar {
+    background-color: rgb(118, 193, 223);
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  .navbar-logo {
+    font-size: 18px;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .navbar-menu {
+    display: flex;
+    gap: 110px;
+  }
+  
+  .navbar-menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .navbar-menu a:hover {
+    text-decoration: underline;
+  }
+  
+  .navbar-right {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .navbar-right a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .navbar-right a:hover {
+    text-decoration: underline;
+  }
+  
+  .navbar-divider {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+.account-list-container {
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    padding: 20px;
+  }
+  
+  .account-list-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  #search-section {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+  
+  #search-section h2 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .search-form {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  #search-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .search-button {
+    padding: 0.75rem 1.5rem;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .search-button:hover {
+    background-color: #3182ce;
+  }
+  
+  #account-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+  }
+  
+  .account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .account-number {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .transaction-button {
+    padding: 0.5rem 1rem;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .transaction-button:hover {
+    background-color: #3182ce;
+  }
+  
+  .investment-info {
+    background-color: #f8f9fa;
+    border-left: 4px solid #4299e1;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .info-item {
+    margin: 0;
+  }
+  
+  .info-label {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .info-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 0.25rem;
+  }
+  
+  .transaction-history {
+    margin-top: 1rem;
+    overflow-x: auto;
+  }
+  
+  .transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .transaction-table th, 
+  .transaction-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .transaction-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+  
+  .no-accounts {
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #666;
+  }
+  
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .search-form {
+      flex-direction: column;
+    }
+  }

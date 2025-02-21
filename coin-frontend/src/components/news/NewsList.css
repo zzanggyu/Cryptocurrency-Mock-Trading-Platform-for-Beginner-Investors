@@ -1,22 +1,23 @@
-.newslist-wrapper {
+.news-wrapper {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1.5rem 1rem;
+    padding: 0 1rem;  /* 좌우 패딩만 남기고 상하는 제거 */
 }
 
-.newslist-layout {
+.content-layout {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;  /* gap 줄임 */
 }
 
-.newslist-main {
+.main-section {
     flex: 1;
+    padding: 0;  /* 패딩 제거 */
 }
 
 /* 검색 섹션 */
-.newslist-search {
+.search-section {
     position: relative;
-    margin: 20px;
+    margin: 1rem 0;  /* 상하 마진만 유지 */
     display: flex;
     align-items: center;
     background-color: white;
@@ -24,13 +25,13 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.newslist-search form {
+.search-section form {
     width: 100%;
     display: flex;
     position: relative;
 }
 
-.newslist-search input {
+.search-section input {
     width: 100%;
     padding: 12px 50px 12px 16px;
     border: 1px solid #e5e7eb;
@@ -40,17 +41,17 @@
     transition: all 0.2s;
 }
 
-.newslist-search input:focus {
-    border-color: #3b82f6;
+.search-section input:focus {
+    border-color: #87CEEB;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-.newslist-search button {
+.search-section button {
     position: absolute;
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    background: #3b82f6;
+    background: #87CEEB;
     color: white;
     border: none;
     border-radius: 6px;
@@ -59,12 +60,23 @@
     transition: background-color 0.2s;
 }
 
-.newslist-search button:hover {
-    background: #2563eb;
+.search-section button:hover {
+    background: #66b1cf;
+}
+
+/* 검색 필터 정렬 */
+.filter-section {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 /* 키워드 섹션 */
-.newslist-keyword-section {
+.keyword-section {
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -72,41 +84,41 @@
     margin-bottom: 1rem;
 }
 
-.newslist-keyword-list {
+.keyword-list {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.newslist-keyword-label {
+.keyword-label {
     font-size: 0.875rem;
     color: #4b5563;
 }
 
-.newslist-keyword-tag {
+.keyword-tag {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.25rem 0.5rem;
     background: #dbeafe;
-    color: #2563eb;
+    color: #87CEEB;
     border-radius: 9999px;
     font-size: 0.875rem;
 }
 
-.newslist-keyword-tag button {
+.keyword-tag button {
     border: none;
     background: none;
-    color: #2563eb;
+    color: #87CEEB;
     cursor: pointer;
 }
 
-.newslist-keyword-tag button:hover {
-    color: #1e40af;
+.keyword-tag button:hover {
+    color: #87CEEB;
 }
 
-.newslist-clear-btn {
+.clear-button {
     border: none;
     background: none;
     color: #6b7280;
@@ -114,88 +126,92 @@
     cursor: pointer;
 }
 
-.newslist-clear-btn:hover {
+.clear-button:hover {
     color: #374151;
 }
 
 /* 뉴스 컨테이너 */
-.newslist-container {
+.news-container {
     background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.newslist-scroll {
-    height: calc(100vh - 200px);
+.news-scroll {
+    height: calc(100vh - 50px);
     overflow-y: auto;
 }
 
-.newslist-items {
+.news-list {
     border-top: 1px solid #e5e7eb;
 }
 
-.newslist-empty {
+.news-list > * {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.no-results {
     padding: 1.5rem;
     text-align: center;
     color: #6b7280;
 }
 
-.newslist-load-more {
+.load-more {
     padding: 1rem;
     text-align: center;
     border-top: 1px solid #e5e7eb;
 }
 
-.newslist-load-button {
+.load-more button {
     padding: 0.5rem 1.5rem;
-    background: #3b82f6;
+    background: #87CEEB;
     color: white;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
 }
 
-.newslist-load-button:hover:not(:disabled) {
-    background: #2563eb;
+.load-more button:hover:not(:disabled) {
+    background: #66b1cf;
 }
 
-.newslist-load-button:disabled,
-.newslist-load-button.loading {
+.load-more button:disabled,
+.load-more button.loading {
     background: #d1d5db;
     cursor: not-allowed;
 }
 
 /* 카테고리 섹션 */
-.newslist-categories {
+.category-section {
     width: 16rem;
     flex-shrink: 0;
+    padding: 0;  /* 패딩 제거 */
 }
 
-.newslist-category-box {
+.category-wrapper {
     background: white;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 1rem;
 }
 
-.newslist-category-title {
+.category-wrapper h2 {
     font-size: 1.25rem;
     font-weight: bold;
-    color: #2563eb;
+    color: #87CEEB;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #e5e7eb;
     margin-bottom: 1rem;
 }
 
-.newslist-category-list {
+.category-wrapper ul {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     list-style: none;
     padding: 0;
+    
 }
 
-.newslist-category-button {
+.category-wrapper button {
     width: 100%;
     text-align: left;
     padding: 0.5rem 0.75rem;
@@ -206,26 +222,18 @@
     cursor: pointer;
 }
 
-.newslist-category-button:hover {
+.category-wrapper button:hover {
     background: #f3f4f6;
 }
 
-.newslist-category-button.active {
+.category-wrapper button.active {
     background: #dbeafe;
-    color: #2563eb;
+    color: black;
 }
 
 /* 로딩 상태 */
-.newslist-loading {
+.loading-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.newslist-login-required {
-    padding: 2rem;
-    text-align: center;
-    color: #6b7280;
-    background: #f9fafb;
-    border-radius: 0.5rem;
 }
