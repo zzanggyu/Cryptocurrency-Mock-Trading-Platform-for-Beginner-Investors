@@ -24,4 +24,5 @@ public class AccountResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private BigDecimal investmentAmount;
+    private BigDecimal profit_rate;
 }

@@ -66,11 +66,11 @@ public class AccountController {
     }
 
     @GetMapping("/accounts/user/{userId}")
-    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(@PathVariable("userId") long userId) {
+    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(@PathVariable("userId") String userId) {
         try {
-            //log.info("사용자 계좌 조회 요청 - userId: {}", userId);  // 로그 추가
+            log.info("사용자 계좌 조회 요청 - userId: {}", userId);  // 로그 추가
             List<AccountResponse> accounts = accountService.getAccountsByUserId(userId);
-            //log.info("조회된 계좌 수: {}", accounts.size());  // 로그 추가
+            log.info("조회된 계좌 수: {}", accounts.size());  // 로그 추가
             return ResponseEntity.ok(accounts);
         } catch (Exception e) {
             log.error("Error retrieving accounts for user ID {}: {}", userId, e.getMessage(), e);

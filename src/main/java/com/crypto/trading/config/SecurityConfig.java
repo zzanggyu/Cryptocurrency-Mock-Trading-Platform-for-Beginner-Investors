@@ -37,7 +37,8 @@ public class SecurityConfig {
                     "/api/assets/**",
                     "/api/markets/**",
                     "/api/coins/**",        // 코인 정보 접근 허용
-                    "/api/upbit/**"         // Upbit API 접근 허용
+                    "/api/upbit/**",
+                    "/api/accounts/**"// Upbit API 접근 허용
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()

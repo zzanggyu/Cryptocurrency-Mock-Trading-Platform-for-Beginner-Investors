@@ -24,8 +24,12 @@ public class Account {
     @Column(nullable = false, unique = true)
     private String accountNumber;
 
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user;
+     
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", referencedColumnName = "username", nullable = false)
     private User user;
 
     @Column(nullable = false, precision = 20, scale = 8)

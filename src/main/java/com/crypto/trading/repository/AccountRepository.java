@@ -22,8 +22,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     
     // 사용자 ID로 모든 계좌 찾기
  // userId(Long)로 계좌 찾기
-    @Query("SELECT a FROM Account a WHERE a.user.userId = :userId")
-    List<Account> findByUserId(@Param("userId") Long userId);
+    @Query("SELECT a FROM Account a WHERE a.user.username = :userId")  
+    List<Account> findByUserId(@Param("userId") String userId);
     
     // JPQL을 사용한 사용자의 총 계좌 잔액 조회
     @Query("SELECT SUM(a.balance) FROM Account a WHERE a.user.userId = :userId")

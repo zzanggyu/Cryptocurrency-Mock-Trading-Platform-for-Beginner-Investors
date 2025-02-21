@@ -107,7 +107,7 @@ public class AccountService {
    }
 
    // 사용자의 모든 계좌 조회
-   public List<AccountResponse> getAccountsByUserId(long userId) {
+   public List<AccountResponse> getAccountsByUserId(String userId) {
        try {
            List<Account> accounts = accountRepository.findByUserId(userId);
            return accounts.stream()
