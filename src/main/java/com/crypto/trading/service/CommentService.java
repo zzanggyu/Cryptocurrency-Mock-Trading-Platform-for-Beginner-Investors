@@ -33,8 +33,17 @@ public class CommentService {
         return dto;
     }
 	
+	private void validateCommentContent(String content) {
+	      if(content == null || content.trim().isEmpty()) {
+	         throw new RuntimeException("댓글 내용을 입력해주세요");
+	      }
+	   }
+
+	
 	@Transactional
 	public CommentDTO createComment(Long boardId, CommentDTO commentDto, HttpSession session) {
+		validateCommentContent(commentDto.getContent());
+
 		Board board = BoardException.validateBoard(boardRepository.findById(boardId));
 		UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
 		User loginuser = BoardException.validateLoginUser(userRepository.findByUsername(user.getUsername()));
@@ -42,7 +51,7 @@ public class CommentService {
 		Comment comment = new Comment();
 		comment.setContent(commentDto.getContent());
 		comment.setBoard(board);
-		comment.setUser(loginuser);
+		comment.setUser(loginuser); 
 		
 		return convertToDto(commentRepository.save(comment));
 	}

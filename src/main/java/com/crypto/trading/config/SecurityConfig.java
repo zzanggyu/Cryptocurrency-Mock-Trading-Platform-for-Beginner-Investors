@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/signup", 
                     "/api/login", 
+                    "api/logout",
                     "/api/market/ticker",
                     "/api/news/**",
                     "/api/all-data/**",
@@ -38,6 +39,11 @@ public class SecurityConfig {
                     "/api/markets/**",
                     "/api/coins/**",        // 코인 정보 접근 허용
                     "/api/upbit/**",
+                    "/api/user/info",
+                    "/api/check-session",
+                    "/api/transactions/**",
+                    "/api/boards/**",
+                    "/api/boards",
                     "/api/accounts/**"// Upbit API 접근 허용
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()

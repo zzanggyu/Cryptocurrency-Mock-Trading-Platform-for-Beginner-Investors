@@ -117,6 +117,37 @@ public class AccountService {
            throw new RuntimeException("사용자 계좌 조회 중 오류 발생: " + e.getMessage());
        }
    }
+   
+   @Transactional
+   public AccountResponse updateOrCreateAccount(AccountCreateRequest request) {
+       User user = userRepository.findByUsername(request.getUserId())
+           .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+       // 기존 계좌 찾기
+       Account account = accountRepository.findByUser(user)
+           .orElseGet(() -> {
+               // 계좌가 없으면 새로 생성
+               Account newAccount = new Account();
+               newAccount.setUser(user);
+               newAccount.setAccountNumber(generateAccountNumber());
+               return newAccount;
+           });
+
+       // 계좌 정보 업데이트
+       account.setBalance(request.getInitialBalance());
+       account.setRiskLevel(request.getRiskLevel());
+       
+       // 투자 한도 계산 및 설정
+       BigDecimal investmentLimit = calculateInvestmentLimit(
+           request.getInitialBalance(), 
+           request.getRiskLevel()
+       );
+       account.setInvestmentLimit(investmentLimit);
+
+       // 저장
+       Account savedAccount = accountRepository.save(account);
+       return convertToDto(savedAccount);
+   }
 
    // 계좌 잔액 수정
    @Transactional

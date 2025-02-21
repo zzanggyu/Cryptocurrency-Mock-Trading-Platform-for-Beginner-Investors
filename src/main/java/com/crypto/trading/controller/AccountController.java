@@ -5,14 +5,25 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.crypto.trading.dto.AccountCreateRequest;
 import com.crypto.trading.dto.AccountResponse;
+import com.crypto.trading.dto.UserResponseDTO;
 import com.crypto.trading.entity.Account.RiskLevel;
 import com.crypto.trading.service.AccountService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.RequiredArgsConstructor;
@@ -27,26 +38,22 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping("/create")
-    public String createAccount() {
-        return "createaccount";
-    }
+ // AccountController.java
+    @PostMapping("/accounts")  // URL과 메서드는 그대로 유지
+    public ResponseEntity<AccountResponse> createAccount(
+        @RequestBody @Valid AccountCreateRequest request,
+        HttpSession session
+    ) {
+        UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
-    @GetMapping("/accounts")
-    public String accountList() {
-        return "accountlist";
-    }
-
-    @GetMapping("/trade")
-    public String trading() {
-        return "trading";
-    }
-
-    @PostMapping("/accounts")
-    public ResponseEntity<AccountResponse> createAccount(@RequestBody @Valid AccountCreateRequest request) {
         log.info("계좌 생성 요청: {}", request);
         try {
-            AccountResponse response = accountService.createAccount(request);
+            request.setUserId(user.getUsername());
+            // 내부적으로는 수정 메서드 호출
+            AccountResponse response = accountService.updateOrCreateAccount(request);
             log.info("계좌 생성 완료 - accountId: {}", response.getId());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -56,9 +63,22 @@ public class AccountController {
     }
 
     @GetMapping("/accounts/{accountId}")
-    public ResponseEntity<AccountResponse> getAccount(@PathVariable("accountId") Long accountId) {
+    public ResponseEntity<AccountResponse> getAccount(
+        @PathVariable("accountId") Long accountId,
+        HttpSession session
+    ) {
+        UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
         try {
-            return ResponseEntity.ok(accountService.getAccount(accountId));
+            AccountResponse account = accountService.getAccount(accountId);
+            // 계좌 소유자 검증
+            if (!account.getUserId().equals(user.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            }
+            return ResponseEntity.ok(account);
         } catch (EntityNotFoundException e) {
             log.error("Account not found for ID {}: {}", accountId, e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -66,11 +86,24 @@ public class AccountController {
     }
 
     @GetMapping("/accounts/user/{userId}")
-    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(@PathVariable("userId") String userId) {
+    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(
+        @PathVariable("userId") String userId,
+        HttpSession session
+    ) {
+        UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // 자신의 계좌만 조회 가능하도록 검증
+        if (!user.getUsername().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
         try {
-            log.info("사용자 계좌 조회 요청 - userId: {}", userId);  // 로그 추가
+            log.info("사용자 계좌 조회 요청 - userId: {}", userId);
             List<AccountResponse> accounts = accountService.getAccountsByUserId(userId);
-            log.info("조회된 계좌 수: {}", accounts.size());  // 로그 추가
+            log.info("조회된 계좌 수: {}", accounts.size());
             return ResponseEntity.ok(accounts);
         } catch (Exception e) {
             log.error("Error retrieving accounts for user ID {}: {}", userId, e.getMessage(), e);
@@ -80,9 +113,22 @@ public class AccountController {
 
     @PutMapping("/accounts/{accountId}/balance")
     public ResponseEntity<Void> updateBalance(
-            @PathVariable("accountId") Long accountId,
-            @RequestParam(name = "amount") @DecimalMin("0.0") BigDecimal amount) {
+        @PathVariable("accountId") Long accountId,
+        @RequestParam(name = "amount") @DecimalMin("0.0") BigDecimal amount,
+        HttpSession session
+    ) {
+        UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
+            // 계좌 소유자 검증
+            AccountResponse account = accountService.getAccount(accountId);
+            if (!account.getUserId().equals(user.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
             accountService.updateBalance(accountId, amount);
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
@@ -96,9 +142,22 @@ public class AccountController {
 
     @PutMapping("/accounts/{accountId}/risk-level")
     public ResponseEntity<Void> updateRiskLevel(
-            @PathVariable("accountId") Long accountId,
-            @RequestParam(name = "riskLevel") RiskLevel riskLevel) {
+        @PathVariable("accountId") Long accountId,
+        @RequestParam(name = "riskLevel") RiskLevel riskLevel,
+        HttpSession session
+    ) {
+        UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
+            // 계좌 소유자 검증
+            AccountResponse account = accountService.getAccount(accountId);
+            if (!account.getUserId().equals(user.getUsername())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
             accountService.updateRiskLevel(accountId, riskLevel);
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
