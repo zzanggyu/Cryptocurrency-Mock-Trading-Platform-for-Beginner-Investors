@@ -1,0 +1,96 @@
+/* src/styles/common.css */
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  /* 입력 필드 포커스 효과 */
+  input:focus, select:focus {
+    outline: none;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+  }
+  
+  /* 버튼 호버 효과 */
+  .btn-hover-effect {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .btn-hover-effect:hover {
+    transform: translateY(-1px);
+  }
+  
+  /* 테이블 스타일 */
+  .table-hover tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  /* 로딩 스피너 */
+  .loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 알림 메시지 스타일 */
+  .alert {
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+  }
+  
+  .alert-success {
+    background-color: #DEF7EC;
+    color: #03543F;
+  }
+  
+  .alert-error {
+    background-color: #FDE8E8;
+    color: #9B1C1C;
+  }
+  
+  /* 카드 효과 */
+  .card-hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* 반응형 폰트 크기 */
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    html {
+      font-size: 16px;
+    }
+  }
