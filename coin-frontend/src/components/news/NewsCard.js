@@ -4,40 +4,40 @@ import axios from 'axios';
 import './NewsCard.css';
 
 const NewsCard = ({ news, onKeywordClick, refreshNews }) => {
-    const [isFavorite, setIsFavorite] = useState(news.favorited || false);
+	const [isFavorite, setIsFavorite] = useState(news.isFavorited || false);
 
-    const handleClick = () => {
-        window.open(news.url, '_blank');
-    };
+	    const handleClick = () => {
+	        window.open(news.url, '_blank');
+	    };
 
-    const handleKeywordClick = (keyword) => {
-        onKeywordClick(keyword);
-    };
+	    const handleKeywordClick = (keyword) => {
+	        onKeywordClick(keyword);
+	    };
 
-    const handleFavoriteClick = async (e) => {
-        e.stopPropagation();
-        try {
-            const response = await axios.post(
-                `http://localhost:8080/api/news/${news.id}/favorite`,
-                null,
-                { withCredentials: true }
-            );
-            
-            if (response.status === 200) {
-                setIsFavorite(response.data.isFavorite);
-                if (refreshNews) {
-                    refreshNews();
-                }
-            }
-        } catch (error) {
-            if (error.response?.status === 401) {
-                alert('로그인이 필요한 서비스입니다.');
-            } else {
-                console.error('관심 뉴스 설정 실패:', error);
-                alert('관심 뉴스 설정에 실패했습니다.');
-            }
-        }
-    };
+	    const handleFavoriteClick = async (e) => {
+	        e.stopPropagation();
+	        try {
+	            const response = await axios.post(
+	                `http://localhost:8080/api/news/${news.id}/favorite`,
+	                null,
+	                { withCredentials: true }
+	            );
+	            
+	            if (response.status === 200 && response.data) {
+	                setIsFavorite(response.data.isFavorite);
+	                if (refreshNews) {
+	                    refreshNews();
+	                }
+	            }
+	        } catch (error) {
+	            if (error.response?.status === 401) {
+	                alert('로그인이 필요한 서비스입니다.');
+	            } else {
+	                console.error('관심 뉴스 설정 실패:', error);
+	                alert('관심 뉴스 설정에 실패했습니다.');
+	            }
+	        }
+	    };
 
     const displayedKeywords = news.keywords?.slice(0, 5);
     const remainingCount = news.keywords?.length - 5;
