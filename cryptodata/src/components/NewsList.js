@@ -5,15 +5,15 @@ import './NewsList.css';
 
 const NewsList = () => {
    const [news, setNews] = useState([]);
-   const [loading, setLoading] = useState(true);
+   const [loading, setLoading] = useState(false);  // 초기 loading 상태를 false로 변경
    const [selectedCategory, setSelectedCategory] = useState('전체 뉴스');
    const [searchTerm, setSearchTerm] = useState('');
    const [actualSearchTerm, setActualSearchTerm] = useState('');
    const [selectedKeywords, setSelectedKeywords] = useState([]);
    const [currentPage, setCurrentPage] = useState(0);
    const [hasMore, setHasMore] = useState(true);
+   const [isTransitioning, setIsTransitioning] = useState(false);  // 추가: 전환 상태 관리
    const isLoggedIn = !!localStorage.getItem('token');
-   const [prevNews, setPrevNews] = useState([]); // 이전 데이터 저장용 state 추가
 
    const categories = [
        '전체 뉴스', '관심 뉴스', 'Digital Asset', 'Market', 'Finance',
@@ -23,10 +23,8 @@ const NewsList = () => {
 
    const fetchNews = useCallback(async () => {
        try {
-           if (currentPage === 0) {
-              setPrevNews(news); // 새로운 카테고리로 변경 시 이전 데이터 저장
-           }
            setLoading(true);
+           setIsTransitioning(true);  // 데이터 fetch 시작시 전환 상태 시작
            let response;
            const pageSize = 10;
 
@@ -42,9 +40,6 @@ const NewsList = () => {
                            ? `http://localhost:8080/api/news/search?keyword=${encodeURIComponent(actualSearchTerm)}&page=${currentPage}&size=${pageSize}`
                            : `http://localhost:8080/api/news?page=${currentPage}&size=${pageSize}`;
 
-           console.log('Requesting URL:', requestUrl);
-           console.log('Current Page:', currentPage);
-
            if (selectedCategory === '관심 뉴스') {
                if (!isLoggedIn) {
                    setNews([]);
@@ -59,46 +54,41 @@ const NewsList = () => {
                response = await axios.get(requestUrl);
            }
 
-           console.log('API Response:', {
-               url: requestUrl,
-               status: response.status,
-               totalElements: response.data.totalElements,
-               totalPages: response.data.totalPages,
-               currentPage: response.data.number,
-               size: response.data.size,
-               content: response.data.content.length
-           });
-
            if (response?.data) {
                if (currentPage === 0) {
-                   setNews(response.data.content);
+                   // 새로운 데이터를 설정하기 전에 이전 데이터를 유지
+                   setNews(prev => {
+                       const newData = response.data.content;
+                       if (JSON.stringify(prev) === JSON.stringify(newData)) {
+                           return prev; // 데이터가 같으면 상태 업데이트 방지
+                       }
+                       return newData;
+                   });
                } else {
                    setNews(prev => {
                        const prevNewsIds = new Set(prev.map(item => item.id));
                        const newContent = response.data.content.filter(item => !prevNewsIds.has(item.id));
-                       console.log('Previous news count:', prev.length);
-                       console.log('New content count:', newContent.length);
                        return [...prev, ...newContent];
                    });
                }
 
                const totalElements = response.data.totalElements;
                const currentLoadedCount = (currentPage + 1) * pageSize;
-               console.log('Total news available:', totalElements);
-               console.log('Currently loaded:', currentLoadedCount);
-               
                setHasMore(currentLoadedCount < totalElements);
            }
        } catch (error) {
            console.error('API Error:', error);
        } finally {
-           setLoading(false);
+           // 전환 효과를 위해 약간의 지연 후 상태 해제
+           setTimeout(() => {
+               setLoading(false);
+               setIsTransitioning(false);
+           }, 300);
        }
    }, [selectedCategory, actualSearchTerm, currentPage, isLoggedIn]);
 
    useEffect(() => {
        setCurrentPage(0);
-       setNews([]);
        if (selectedCategory === '관심 뉴스') {
            setHasMore(true);
        }
@@ -113,19 +103,22 @@ const NewsList = () => {
 
    const handleSearch = (e) => {
        e.preventDefault();
+       setIsTransitioning(true);
        setActualSearchTerm(searchTerm);
        setCurrentPage(0);
    };
 
+   const handleCategoryChange = (category) => {
+       if (category === selectedCategory) return; // 같은 카테고리 선택 시 무시
+       setIsTransitioning(true);  // 카테고리 변경 시작시 전환 상태 시작
+       setSelectedCategory(category);
+   };
+
    const loadMore = useCallback(() => {
        if (!loading && hasMore) {
-           console.log('Loading more... Current page:', currentPage);
-           setCurrentPage(prev => {
-               console.log('Updating to page:', prev + 1);
-               return prev + 1;
-           });
+           setCurrentPage(prev => prev + 1);
        }
-   }, [loading, hasMore, currentPage]);
+   }, [loading, hasMore]);
 
    const handleKeywordClick = (keyword) => {
        setSelectedKeywords(prev => {
@@ -142,27 +135,20 @@ const NewsList = () => {
        return matchesKeywords;
    });
 
-   if (loading && currentPage === 0) {
-       return (
-           <div className="loading-wrapper">
-               <div className="loading-text">뉴스를 불러오는 중...</div>
-           </div>
-       );
-   }
-
    return (
        <div className="news-wrapper">
            <div className="content-layout">
                <div className="main-section">
                    <div className="search-section">
-                       <form onSubmit={handleSearch}>
+                       <form onSubmit={handleSearch} className="search-form">
                            <input
                                type="text"
                                placeholder="제목, 내용, 키워드로 검색..."
                                value={searchTerm}
                                onChange={(e) => setSearchTerm(e.target.value)}
+                               className="search-input"
                            />
-                           <button type="submit">🔍</button>
+                           <button type="submit" className="search-button">🔍</button>
                        </form>
                    </div>
 
@@ -173,7 +159,7 @@ const NewsList = () => {
                                {selectedKeywords.map(keyword => (
                                    <span key={keyword} className="keyword-tag">
                                        #{keyword}
-                                       <button onClick={() => handleKeywordClick(keyword)}>×</button>
+                                       <button onClick={() => handleKeywordClick(keyword)} className="keyword-remove">×</button>
                                    </span>
                                ))}
                                <button 
@@ -187,56 +173,43 @@ const NewsList = () => {
                    )}
 
                    <div className="news-container">
-                       <div className="news-scroll">
+                       <div className={`news-scroll ${isTransitioning ? 'transitioning' : ''}`}>
                            {selectedCategory === '관심 뉴스' && !isLoggedIn ? (
                                <div className="login-required">
                                    <p>로그인하면 관심 뉴스를 확인할 수 있습니다.</p>
                                </div>
                            ) : (
-                               <div className="news-list">
-                                   {loading && currentPage === 0 ? (
-                                    // 카테고리 변경 시 이전 데이터 표시
-                                    prevNews.map((item) => (
-                                        <NewsCard 
-                                            key={item.id} 
-                                            news={item}
-                                            onKeywordClick={handleKeywordClick}
-                                            style={{ opacity: 0.5 }}
-                                        />
-                                    ))
-                                ) : (
-                                    filteredNews.map((item) => (
-                                        <NewsCard 
-                                            key={item.id} 
-                                            news={item}
-                                            onKeywordClick={handleKeywordClick}
-                                            refreshNews={() => {
-                                                if (selectedCategory === '관심 뉴스') {
-                                                    setTimeout(() => {
-                                                        setCurrentPage(0);
-                                                        setNews([]);
-                                                        fetchNews();
-                                                    }, 100);
-                                                }
-                                            }}
-                                        />
-                                    ))
-                                )}
-                                {filteredNews.length === 0 && !loading && (
-                                    <div className="no-results">
-                                        검색 결과가 없습니다.
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                               <div className={`news-list ${loading ? 'loading' : ''}`}>
+                                   {filteredNews.map((item) => (
+                                       <NewsCard 
+                                           key={item.id} 
+                                           news={item} 
+                                           onKeywordClick={handleKeywordClick}
+                                           refreshNews={() => {
+                                               if (selectedCategory === '관심 뉴스') {
+                                                   setTimeout(() => {
+                                                       setCurrentPage(0);
+                                                       fetchNews();
+                                                   }, 100);
+                                               }
+                                           }}
+                                       />
+                                   ))}
+                                   {filteredNews.length === 0 && !loading && (
+                                       <div className="no-results">
+                                           검색 결과가 없습니다.
+                                       </div>
+                                   )}
+                               </div>
+                           )}
+                       </div>
                        
                        {hasMore && (
                            <div className="load-more">
                                <button
                                    onClick={loadMore}
                                    disabled={loading}
-                                   className={loading ? 'loading' : ''}
+                                   className={`load-more-button ${loading ? 'loading' : ''}`}
                                >
                                    {loading ? '로딩 중...' : '더 보기'}
                                </button>
@@ -252,8 +225,8 @@ const NewsList = () => {
                            {categories.map((category) => (
                                <li key={category}>
                                    <button 
-                                       className={selectedCategory === category ? 'active' : ''}
-                                       onClick={() => setSelectedCategory(category)}
+                                       className={`category-button ${selectedCategory === category ? 'active' : ''}`}
+                                       onClick={() => handleCategoryChange(category)}
                                    >
                                        {category}
                                    </button>
