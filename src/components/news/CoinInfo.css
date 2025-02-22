@@ -105,8 +105,8 @@ tbody tr {
 }
 
 .tab-button.active {
-    color: #3b82f6;
-    border-bottom: 2px solid #3b82f6;
+    color: #87CEEB;
+    border-bottom: 2px solid #87CEEB;
 }
 
 .button-wrapper {
@@ -117,7 +117,7 @@ tbody tr {
 
 .toggle-button {
     padding: 0.25rem 0.75rem;
-    background-color: #3b82f6;
+    background-color: #87CEEB;
     color: white;
     border: none;
     border-radius: 0.25rem;
@@ -127,5 +127,6 @@ tbody tr {
 }
 
 .toggle-button:hover {
-    background-color: #2563eb;
+    background-color: #66b1cf;
 }
+

@@ -30,17 +30,23 @@ function MarketIndex() {
             }
         };
 
-        const fetchNews = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/market/news', {
-                    withCredentials: true
-                });
-				console.log('뉴스 응답:', response.data);
-                setNewsData(response.data);
-            } catch (error) {
-                console.error('뉴스 조회 실패:', error);
-            }
-        };
+		const fetchNews = async () => {
+		    try {
+		        const response = await axios.get('http://localhost:8080/api/market/news', {
+		            withCredentials: true
+		        });
+		        console.log('뉴스 API 응답:', response);
+		        console.log('뉴스 데이터:', response.data);
+		        
+		        if (Array.isArray(response.data)) {
+		            setNewsData(response.data);
+		        } else {
+		            console.error('뉴스 데이터가 배열이 아님:', response.data);
+		        }
+		    } catch (error) {
+		        console.error('뉴스 조회 실패:', error.response || error);
+		    }
+		};
 
         fetchData();
         fetchNews();
