@@ -44,6 +44,8 @@ public class SecurityConfig {
                     "/api/transactions/**",
                     "/api/boards/**",
                     "/api/boards",
+                    "/api/market/news",
+                    "/api/news/crawled",
                     "/api/accounts/**"// Upbit API 접근 허용
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()

@@ -21,7 +21,7 @@ class BlockMediaCrawler:
         }
         # 크롬 옵션 설정
         chrome_options = Options()
-        hrome_options.add_argument("--headless")  # 헤드리스 모드 (크롬 창 안 보임)
+        chrome_options.add_argument("--headless")  # 헤드리스 모드 (크롬 창 안 보임)
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -105,7 +105,7 @@ class BlockMediaCrawler:
                     title_elem = article.select_one('h2.is-title.post-title a')
                     if not title_elem:
                         print("제목 요소를 찾을 수 없음")
-                        continue
+                        continue   
                     
                     title = title_elem.text.strip()
                     link = title_elem['href']

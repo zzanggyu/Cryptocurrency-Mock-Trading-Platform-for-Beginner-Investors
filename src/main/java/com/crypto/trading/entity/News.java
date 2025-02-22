@@ -20,23 +20,23 @@ public class News {
     private Long id;
     
     @Column(nullable = false)
-    private String title;
+    private String title;	
     
     @Column(columnDefinition = "TEXT")
     private String content;
     
     private String url;
     
-    @Column(length = 1000)
+    @Column(name = "Image_Url", length = 1000)
     private String imageUrl;
-    
+    @Column(name = "publish_date")
     private LocalDateTime publishDate;
     
     private String source;
     
     private String author;
     
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "cryptonews_categories", joinColumns = @JoinColumn(name = "news_id"))
     @Column(name = "category")
     private Set<String> categories = new HashSet<>();
