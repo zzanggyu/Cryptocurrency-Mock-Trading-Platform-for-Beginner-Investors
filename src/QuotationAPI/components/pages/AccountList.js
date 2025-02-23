@@ -1,45 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/AccountList.css';
 
-/* 입금 기능 추가 예정*/
-
-
-
-
-
-
-/* 계좌 삭제 기능 추가 예정*/
-
-
-
-
-
-
 export default function AccountList() {
-  const [userId, setUserId] = useState('');
   const [accounts, setAccounts] = useState([]);
   const [transactionHistories, setTransactionHistories] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [visibleHistories, setVisibleHistories] = useState({}); // 거래내역 표시 상태 관리
+
+  useEffect(() => {
+    getAccountsByUserId();
+  }, []);
+
+  // 계좌 정보 가져온 후 각 계좌의 거래내역도 자동으로 가져오기
+  useEffect(() => {
+    accounts.forEach(account => {
+      getTransactionHistory(account.id);
+      setVisibleHistories(prev => ({...prev, [account.id]: true})); // 기본적으로 모든 거래내역 표시
+    });
+  }, [accounts]);
 
   const getAccountsByUserId = async () => {
-    if (!userId) {
-      alert('사용자 ID를 입력해주세요.');
-      return;
-    }
-    if (!/^[a-zA-Z0-9]+$/.test(userId)) {
-      alert('사용자 ID는 영문자와 숫자만 포함할 수 있습니다.');
-      return;
-    }
-
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/accounts/user/${userId}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const sessionResponse = await fetch('http://localhost:8080/api/check-session', {
+        credentials: 'include'
+      });
       
-      // 데이터 검증
+      if (!sessionResponse.ok) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      const userInfo = await sessionResponse.json();
+      
+      const accountResponse = await fetch(`http://localhost:8080/api/accounts/user/${userInfo.username}`, {
+        credentials: 'include'
+      });
+
+      if (!accountResponse.ok) {
+        throw new Error(`HTTP error! status: ${accountResponse.status}`);
+      }
+
+      const data = await accountResponse.json();
+      
       if (Array.isArray(data)) {
         setAccounts(data);
       } else {
@@ -49,15 +51,17 @@ export default function AccountList() {
     } catch (error) {
       console.error('계좌 조회 중 오류:', error);
       alert('계좌 조회 중 오류가 발생했습니다: ' + error.message);
-      setAccounts([]); // 오류 발생 시 빈 배열로 초기화
+      setAccounts([]);
     } finally {
-      setIsLoading(false); // 로딩 종료
+      setIsLoading(false);
     }
   };
 
   const getTransactionHistory = async (accountId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/transactions/account/${accountId}`);
+      const response = await fetch(`http://localhost:8080/api/transactions/account/${accountId}`, {
+        credentials: 'include'
+      });
       const data = await response.json();
       setTransactionHistories(prev => ({
         ...prev,
@@ -67,6 +71,13 @@ export default function AccountList() {
       console.error('거래내역 조회 실패:', error);
       alert('거래내역 조회 중 오류가 발생했습니다.');
     }
+  };
+
+  const toggleTransactionHistory = (accountId) => {
+    setVisibleHistories(prev => ({
+      ...prev,
+      [accountId]: !prev[accountId]
+    }));
   };
 
   const getRiskLevelText = (riskLevel) => {
@@ -91,29 +102,11 @@ export default function AccountList() {
     return percentages[riskLevel] || 0;
   };
 
-  
   return (
     <div className="account-list-container">
       <div className="account-list-content">
         <div className="search-section">
-          <h2>계좌 조회</h2>
-          <div className="search-form">
-            <input
-              type="text"
-              className="search-input"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="사용자 ID를 입력하세요"
-              pattern="^[a-zA-Z0-9]+$"
-            />
-            <button 
-              onClick={getAccountsByUserId} 
-              className="search-button"
-              disabled={isLoading} // 로딩 중일 때 버튼 비활성화
-            >
-              {isLoading ? '조회 중...' : '조회'}
-            </button>
-          </div>
+          <h2>내 계좌 목록</h2>
         </div>
 
         <div className="account-list">
@@ -128,8 +121,11 @@ export default function AccountList() {
               <div key={account.id} className="account-card">
                 <div className="account-header">
                   <span className="account-number">계좌번호: {account.accountNumber}</span>
-                  <button className="transaction-button" onClick={() => getTransactionHistory(account.id)}>
-                    거래내역
+                  <button 
+                    className="transaction-button"
+                    onClick={() => toggleTransactionHistory(account.id)}
+                  >
+                    {visibleHistories[account.id] ? '거래내역 숨기기' : '거래내역 보기'}
                   </button>
                 </div>
 
@@ -153,6 +149,24 @@ export default function AccountList() {
                     </div>
                   </div>
                 </div>
+
+                {/* 거래내역 표시 영역 */}
+                {visibleHistories[account.id] && transactionHistories[account.id] && (
+                  <div className="transaction-history">
+                    <h3>거래내역</h3>
+                    <div className="transaction-list">
+                      {transactionHistories[account.id].map(transaction => (
+                        <div key={transaction.id} className="transaction-item">
+                          <span>{transaction.transactionDateTime}</span>
+                          <span>{transaction.type === 'BUY' ? '매수' : '매도'}</span>
+                          <span>{transaction.coinSymbol}</span>
+                          <span>{transaction.quantity} 개</span>
+                          <span>{transaction.price.toLocaleString()} 원</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           )}
