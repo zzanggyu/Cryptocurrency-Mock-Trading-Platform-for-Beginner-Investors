@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -168,7 +169,27 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+    
+    @PostMapping("/accounts/reset") 
+    public ResponseEntity<?> resetTransactions(HttpSession session) {
+        // 로그 추가
+        log.info("Reset transactions method called");
+        
+        try {
+            UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+            if (user == null) {
+                log.warn("Unauthorized reset attempt");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
 
+            log.info("Resetting transactions for user: {}", user.getUsername());
+            accountService.resetTransactions(user.getUsername());
+            return ResponseEntity.ok().body("거래 내역이 초기화되었습니다.");
+        } catch (Exception e) {
+            log.error("Reset transactions error", e);
+            return ResponseEntity.badRequest().body("거래 내역 초기화 중 오류가 발생했습니다.");
+        }
+    }
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleNotFound(EntityNotFoundException e) {
         log.error("Entity not found: {}", e.getMessage());

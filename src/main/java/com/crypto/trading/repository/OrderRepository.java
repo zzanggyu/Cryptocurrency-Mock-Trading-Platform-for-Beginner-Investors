@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.crypto.trading.entity.Order;
 import com.crypto.trading.entity.Order.OrderStatus;
@@ -49,4 +50,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 계좌별 대기 주문 조회
     @Query("SELECT o FROM Order o WHERE o.account.id = :accountId AND o.status = 'PENDING'")
     List<Order> findPendingOrdersByAccountId(@Param("accountId") Long accountId);
+    
+    // 사용자 이름으로 주문 삭제
+    @Transactional
+    void deleteByAccount_User_Username(String username);
 }

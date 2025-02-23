@@ -20,9 +20,9 @@ public class AccountResponse {
     private String userId;
     private BigDecimal balance;
     private BigDecimal investmentLimit;
-    private RiskLevel riskLevel;
+    private BigDecimal investmentAmount;
+    private String riskLevel;  // RiskLevel enum 대신 String으로 변경
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private BigDecimal investmentAmount;
     private BigDecimal profit_rate;
 }

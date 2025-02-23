@@ -60,7 +60,7 @@ public class UserService {
         user.setNickname(signupDto.getNickname());
         user.setEmail(signupDto.getEmail());
         user.setPassword(bCryptEncoder.encode(signupDto.getPassword()));
-        user.setStyle("CONSERVATIVE"); // 기본 투자 성향
+        user.setStyle("보통"); // 기본 투자 성향
         
         User savedUser = userRepository.save(user);
 
@@ -68,7 +68,7 @@ public class UserService {
         Account account = new Account();
         account.setUser(savedUser);
         account.setAccountNumber(UUID.randomUUID().toString().substring(0, 10));
-        account.setRiskLevel(RiskLevel.CONSERVATIVE);
+        account.setRiskLevel(RiskLevel.보통);
         accountRepository.save(account);
 
         return UserResponseDTO.from(savedUser);

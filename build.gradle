@@ -52,6 +52,9 @@ dependencies {
     
     // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    
+    //데이터베이스 트랜잭션을 관리하는 Spring의 기능
+    implementation 'org.springframework:spring-tx'
 }
 
 tasks.named('test') {

@@ -1,15 +1,31 @@
 package com.crypto.trading.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "accounts")
@@ -46,8 +62,10 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RiskLevel riskLevel = RiskLevel.CONSERVATIVE;  // 기본값 설정
+    private RiskLevel riskLevel = RiskLevel.보통;  // 기본값 설정
+    
     @OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference  // 여전히 관리되는 쪽에서는 이 어노테이션을 사용
     private List<Transaction> transactions = new ArrayList<>();
     
     private LocalDateTime createdAt;
@@ -67,11 +85,11 @@ public class Account {
     }
    
     public enum RiskLevel {
-        CONSERVATIVE,
-        MODERATELY_CONSERVATIVE,
-        MODERATE,
-        MODERATELY_AGGRESSIVE,
-        AGGRESSIVE
+        보수적,
+        약간_보수적,
+        보통,
+        약간_공격적,
+        공격적
     }
 
     public void decreaseBalance(BigDecimal amount) {

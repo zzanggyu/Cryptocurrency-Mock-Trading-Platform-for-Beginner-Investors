@@ -16,6 +16,8 @@ import com.crypto.trading.entity.Account;
 import com.crypto.trading.entity.Account.RiskLevel;
 import com.crypto.trading.entity.User;
 import com.crypto.trading.repository.AccountRepository;
+import com.crypto.trading.repository.OrderRepository;
+import com.crypto.trading.repository.TransactionRepository;
 import com.crypto.trading.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -27,15 +29,17 @@ import lombok.RequiredArgsConstructor;
 public class AccountService {
    private final AccountRepository accountRepository;
    private final UserRepository userRepository;
+   private final TransactionRepository transactionRepository;
+   private final OrderRepository orderRepository;
 
    // 위험 수준별 투자 한도 비율을 정의
    private static final Map<RiskLevel, BigDecimal> RISK_LEVEL_LIMITS = Map.of(
-       RiskLevel.CONSERVATIVE, new BigDecimal("0.10"),           // 10% 보수적
-       RiskLevel.MODERATELY_CONSERVATIVE, new BigDecimal("0.15"), // 15% 약간 보수적
-       RiskLevel.MODERATE, new BigDecimal("0.20"),               // 20% 보통
-       RiskLevel.MODERATELY_AGGRESSIVE, new BigDecimal("0.25"),  // 25% 약간 공격적
-       RiskLevel.AGGRESSIVE, new BigDecimal("0.30")             // 30% 공격적
-   );
+		    RiskLevel.보수적, new BigDecimal("0.10"),           // 10%
+		    RiskLevel.약간_보수적, new BigDecimal("0.15"),      // 15%
+		    RiskLevel.보통, new BigDecimal("0.20"),            // 20%
+		    RiskLevel.약간_공격적, new BigDecimal("0.25"),      // 25%
+		    RiskLevel.공격적, new BigDecimal("0.30")           // 30%
+		);
 
    // 계좌 생성
    @Transactional
@@ -59,7 +63,7 @@ public class AccountService {
            // 4. RiskLevel 설정 (기본값 추가)
            RiskLevel riskLevel = (user.getStyle() != null) ? 
                convertStyleToRiskLevel(user.getStyle()) : 
-               RiskLevel.CONSERVATIVE;
+               RiskLevel.보통;
            account.setRiskLevel(riskLevel);
 
            // 5. 투자 한도 계산 (null 체크 추가)
@@ -83,18 +87,20 @@ public class AccountService {
        }
    }
    
+   
+   
 // 사용자 스타일을 RiskLevel로 변환하는 메서드 추가
    public RiskLevel convertStyleToRiskLevel(String style) {
-       if (style == null) return RiskLevel.CONSERVATIVE;
-       
-       return switch (style.toUpperCase()) {
-           case "AGGRESSIVE" -> RiskLevel.AGGRESSIVE;
-           case "MODERATELY_AGGRESSIVE" -> RiskLevel.MODERATELY_AGGRESSIVE;
-           case "MODERATE" -> RiskLevel.MODERATE;
-           case "MODERATELY_CONSERVATIVE" -> RiskLevel.MODERATELY_CONSERVATIVE;
-           default -> RiskLevel.CONSERVATIVE;
-       };
-   }
+	    if (style == null) return RiskLevel.보수적;
+	    
+	    return switch (style) {
+	        case "공격적" -> RiskLevel.공격적;
+	        case "약간 공격적" -> RiskLevel.약간_공격적;
+	        case "보통" -> RiskLevel.보통;
+	        case "약간 보수적" -> RiskLevel.약간_보수적;
+	        default -> RiskLevel.보수적;
+	    };
+	}
 
    // 특정 계좌 조회
    public AccountResponse getAccount(Long accountId) {
@@ -136,6 +142,10 @@ public class AccountService {
        // 계좌 정보 업데이트
        account.setBalance(request.getInitialBalance());
        account.setRiskLevel(request.getRiskLevel());
+       
+       // User의 style도 함께 업데이트 추가
+       user.setStyle(request.getRiskLevel().toString());
+       userRepository.save(user);
        
        // 투자 한도 계산 및 설정
        BigDecimal investmentLimit = calculateInvestmentLimit(
@@ -183,17 +193,46 @@ public class AccountService {
            }
            account.setRiskLevel(riskLevel);
            
-           // 위험 수준 변경에 따른 투자 한도와 투자금액 재계산
+           // User의 style도 함께 업데이트
+           User user = account.getUser();
+           user.setStyle(riskLevel.toString());
+           userRepository.save(user);
+           
+           // 투자 한도 재계산
            BigDecimal newInvestmentLimit = calculateInvestmentLimit(
                account.getBalance(), 
                riskLevel
            );
            account.setInvestmentLimit(newInvestmentLimit);
-           account.setInvestmentAmount(newInvestmentLimit); // 투자금액도 업데이트
+           account.setInvestmentAmount(newInvestmentLimit);
        } catch (EntityNotFoundException e) {
            throw new EntityNotFoundException("계좌를 찾을 수 없습니다: " + accountId);
        } catch (Exception e) {
            throw new RuntimeException("위험 수준 수정 중 오류 발생: " + e.getMessage());
+       }
+   }
+   
+   @Transactional
+   public void resetTransactions(String username) {
+       try {
+           // 사용자 존재 여부 확인
+           User user = userRepository.findByUsername(username)
+               .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+           // 거래 내역 삭제
+           transactionRepository.deleteByAccount_User_Username(username);
+           
+           // 주문 내역 삭제
+           orderRepository.deleteByAccount_User_Username(username);
+
+           // 계좌의 투자금액 초기화
+           List<Account> accounts = accountRepository.findByUserId(username);
+           for (Account account : accounts) {
+               account.setInvestmentAmount(BigDecimal.ZERO);
+               accountRepository.save(account);
+           }
+       } catch (Exception e) {
+           throw new RuntimeException("거래 내역 초기화 중 오류 발생: " + e.getMessage());
        }
    }
 
@@ -217,16 +256,16 @@ public class AccountService {
    // Entity를 DTO로 변환
    // DTO 변환 메서드 수정
    private AccountResponse convertToDto(Account account) {
-       return AccountResponse.builder()
-               .id(account.getId())
-               .accountNumber(account.getAccountNumber())
-               .userId(account.getUser().getUsername()) // User 엔티티에서 username 가져오기
-               .balance(account.getBalance())
-               .investmentLimit(account.getInvestmentLimit())
-               .investmentAmount(account.getInvestmentAmount())
-               .riskLevel(account.getRiskLevel())
-               .createdAt(account.getCreatedAt())
-               .updatedAt(account.getUpdatedAt())
-               .build();
-   }
+	    return AccountResponse.builder()
+	            .id(account.getId())
+	            .accountNumber(account.getAccountNumber())
+	            .userId(account.getUser().getUsername())
+	            .balance(account.getBalance())
+	            .investmentLimit(account.getInvestmentLimit())
+	            .investmentAmount(account.getInvestmentAmount())
+	            .riskLevel(account.getRiskLevel().toString())  // toString() 추가
+	            .createdAt(account.getCreatedAt())
+	            .updatedAt(account.getUpdatedAt())
+	            .build();
+	}
 }

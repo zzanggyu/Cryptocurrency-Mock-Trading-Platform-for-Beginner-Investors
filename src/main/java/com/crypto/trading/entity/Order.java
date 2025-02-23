@@ -37,6 +37,7 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
+    @JsonIgnore  // 🔥 무한 루프 방지
     private Account account;
 
     @Column(nullable = false)

@@ -2,9 +2,11 @@ package com.crypto.trading.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.crypto.trading.dto.CoinSummaryDTO;
 import com.crypto.trading.entity.Transaction;
@@ -75,4 +77,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
        @Param("accountId") Long accountId, 
        @Param("coinSymbol") String coinSymbol
    );
+   
+// 사용자 이름으로 트랜잭션 삭제
+   @Transactional
+   void deleteByAccount_User_Username(String username);
 }
