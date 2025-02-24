@@ -33,12 +33,14 @@ export default function AccountList() {
 
     setIsLoading(true); // 로딩 시작
     try {
-      const response = await fetch(`http://localhost:8080/api/accounts/user/${userId}`);
+      const response = await fetch(`http://localhost:8080/api/accounts/user/${userId}`, {
+        credentials: 'include', // 쿠키 포함
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      
+
       // 데이터 검증
       if (Array.isArray(data)) {
         setAccounts(data);
@@ -57,7 +59,9 @@ export default function AccountList() {
 
   const getTransactionHistory = async (accountId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/transactions/account/${accountId}`);
+      const response = await fetch(`http://localhost:8080/api/transactions/account/${accountId}`, {
+        credentials: 'include', // 쿠키 포함
+      });
       const data = await response.json();
       setTransactionHistories(prev => ({
         ...prev,
@@ -68,6 +72,7 @@ export default function AccountList() {
       alert('거래내역 조회 중 오류가 발생했습니다.');
     }
   };
+
 
   const getRiskLevelText = (riskLevel) => {
     const riskLevelMap = {

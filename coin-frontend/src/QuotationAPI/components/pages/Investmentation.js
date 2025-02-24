@@ -2,124 +2,159 @@ import { useState, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import './Investment.css';
 
-
-/* 기간별 수익률 추가 예정 */
-
-
-
-
-
-
-
 export default function Investment() {
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [accounts, setAccounts] = useState([]);
-  const [portfolio, setPortfolio] = useState([]);
-  const [accountInfo, setAccountInfo] = useState(null);
-  const [markets, setMarkets] = useState([]);
-  const [selectedPeriod, setSelectedPeriod] = useState('daily'); // 'daily', 'weekly', 'monthly'
-  const [periodProfits, setPeriodProfits] = useState(null);
+  // 값이 undefined나 null일 때의 안전한 처리를 위한 유틸리티 함수
   const safeToFixed = (value) => (value !== undefined && value !== null ? value.toFixed(2) : 'N/A');
-  // 기간별 수익률 조회 함수 추가
+
+  // 상태 관리
+  const [accountInfo, setAccountInfo] = useState(null);
+  const [portfolio, setPortfolio] = useState([]);
+  const [markets, setMarkets] = useState([]);
+  const [selectedPeriod, setSelectedPeriod] = useState('daily');
+  const [periodProfits, setPeriodProfits] = useState(null);
+  // 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 세션에서 사용자 정보를 가져오는 함수
+  const getUserAccount = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      // 세션에서 사용자 정보 가져오기
+      const response = await fetch('http://localhost:8080/api/check-session', {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+        throw new Error('사용자 정보를 불러올 수 없습니다.');
+      }
+  
+      const userData = await response.json();
+      
+      // 사용자의 계좌 정보 가져오기
+      const accountResponse = await fetch(`http://localhost:8080/api/accounts/user/${userData.username}`, {
+        credentials: 'include'
+      });
+      
+      if (!accountResponse.ok) {
+        throw new Error('계좌 정보를 불러올 수 없습니다.');
+      }
+  
+      const accountData = await accountResponse.json();
+      if (accountData && accountData.length > 0) {
+        setAccountInfo(accountData[0]);  // 사용자당 계좌는 하나이므로 첫 번째 계좌 사용
+        return accountData[0].id;
+      } else {
+        throw new Error('계좌가 없습니다.');
+      }
+    } catch (error) {
+      console.error('계좌 정보 로드 실패:', error);
+      // setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // 기간별 수익률 데이터 로드
   const loadPeriodProfits = useCallback(async () => {
-    if (!selectedAccount) return;
+    if (!accountInfo) return;
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/transactions/account/${selectedAccount}/profits?period=${selectedPeriod}`
+        `http://localhost:8080/api/transactions/account/${accountInfo.id}/profits?period=${selectedPeriod}`
       );
+      if (!response.ok) {
+        throw new Error('수익률 데이터를 불러올 수 없습니다.');
+      }
       const data = await response.json();
       setPeriodProfits(data);
     } catch (error) {
       console.error('기간별 수익률 조회 실패:', error);
+      setPeriodProfits(null);
     }
-  }, [selectedAccount, selectedPeriod]);
+  }, [accountInfo, selectedPeriod]);
 
   // 실시간 데이터 업데이트 함수
   const updateRealTimeData = useCallback(async () => {
-    if (!selectedAccount) return;
+    if (!accountInfo) return;
 
     try {
-      const [accountResponse, holdingsResponse, marketsResponse] = await Promise.all([
-        fetch(`http://localhost:8080/api/accounts/${selectedAccount}`),
-        fetch(`http://localhost:8080/api/transactions/account/${selectedAccount}/summary`),
+      const [holdingsResponse, marketsResponse] = await Promise.all([
+        fetch(`http://localhost:8080/api/transactions/account/${accountInfo.id}/summary`),
         fetch('http://localhost:8080/api/upbit/markets')
       ]);
 
-      const accountData = await accountResponse.json();
       const holdingsData = await holdingsResponse.json();
       const marketsData = await marketsResponse.json();
 
-      setAccountInfo(accountData);
       setPortfolio(holdingsData);
       setMarkets(marketsData);
     } catch (error) {
       console.error('데이터 업데이트 실패:', error);
     }
-  }, [selectedAccount]);
-
-  // 계좌 목록 로드
-  const loadAccounts = useCallback(async () => {
-    try {
-      const userId = "testuser"; // 이 부분 수정해야됨 로그인 부분이랑 연결!! 현재 하드코딩
-      const response = await fetch(`http://localhost:8080/api/accounts/user/${userId}`);
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setAccounts(data);
-      } else {
-        setAccounts([]);
-        console.error('계좌 데이터가 배열 형식이 아닙니다.');
-      }
-    } catch (error) {
-      console.error('계좌 목록 로드 실패:', error);
-      setAccounts([]);
-    }
-  }, []);
+  }, [accountInfo]);
 
   // 초기 데이터 로드
   useEffect(() => {
-    loadAccounts();
-  }, [loadAccounts]);
+    getUserAccount();
+  }, [getUserAccount]);
 
+  // 실시간 데이터 업데이트 설정
   useEffect(() => {
-    if (selectedAccount) {
-      loadPeriodProfits();
-    }
-  }, [selectedAccount, selectedPeriod, loadPeriodProfits]);
-
-  // 실시간 데이터 업데이트 - loadPeriodProfits 제거
-  useEffect(() => {
-    if (selectedAccount) {
+    if (accountInfo) {
       updateRealTimeData();
       const interval = setInterval(updateRealTimeData, 5000);
-      return () => interval && clearInterval(interval);
+      return () => clearInterval(interval);
     }
-  }, [selectedAccount, updateRealTimeData]);
+  }, [accountInfo, updateRealTimeData]);
+
+  // 기간별 수익률 데이터 로드 설정
+  useEffect(() => {
+    if (accountInfo) {
+      loadPeriodProfits();
+    }
+  }, [accountInfo, selectedPeriod, loadPeriodProfits]);
 
   const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
+
+  // 로딩 중일 때 표시할 컴포넌트
+  if (isLoading) {
+    return (
+      <div className="investment-container">
+        <div className="loading-message">데이터를 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  // 계좌 정보가 없을 때 표시할 컴포넌트
+  if (!accountInfo) {
+    return (
+      <div className="investment-container">
+        <div className="error-message">계좌 정보를 찾을 수 없습니다.</div>
+      </div>
+    );
+  }
 
 
   return (
     <div className="investment-container">
       <div className="investment-content">
-        {/* 계좌 선택 섹션 */}
+        {/* 계좌 정보 섹션 */}
         <div className="account-select-card">
-          <h2 className="account-select-title">계좌 선택</h2>
-          <select
-            className="account-select"
-            onChange={(e) => setSelectedAccount(e.target.value)}
-            value={selectedAccount || ''}
-          >
-            <option value="">계좌를 선택하세요</option>
-            {accounts.map(account => (
-              <option key={account.id} value={account.id}>
-                {account.accountNumber} ({account.balance.toLocaleString()} KRW)
-              </option>
-            ))}
-          </select>
+          <h2 className="account-select-title">계좌 정보</h2>
+          <div className="account-info">
+            <div className="account-number">
+              계좌번호: {accountInfo.accountNumber}
+            </div>
+            <div className="account-balance">
+              잔액: {accountInfo.balance.toLocaleString()} KRW
+            </div>
+          </div>
         </div>
-
-        {selectedAccount && accountInfo && (
+        {accountInfo && (
           <>
             {/* 계좌 요약 정보 */}
             <div className="account-select-card">

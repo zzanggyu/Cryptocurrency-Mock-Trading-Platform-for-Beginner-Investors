@@ -3,7 +3,6 @@ package com.crypto.trading.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.crypto.trading.entity.Account.RiskLevel;
 
 import lombok.Getter;
 import lombok.Builder;
