@@ -2,8 +2,8 @@ import { memo, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { useWsTicker } from "use-upbit-api";
-import { marketCodesState, selectedCoinInfoState, selectedCoinState } from "./atom";
-
+import { marketCodesState, selectedCoinInfoState, selectedCoinState, userState } from "./atom";
+import axios from 'axios';
 
 const convertMillonWon = (value) => value / 1000000;
 
@@ -141,7 +141,43 @@ const CoinSelector = () => {
   const [showFavorites, setShowFavorites] = useState(false);
   const { socketData } = useWsTicker(marketCodes);
   const [selectedCoinInfo, setSelectedCoinInfo] = useRecoilState(selectedCoinInfoState);
+  const [user] = useRecoilState(userState);
 
+  // 즐겨찾기 목록 불러오기
+  const loadFavorites = async () => {
+      try {
+          const response = await axios.get('http://localhost:8080/api/favorites', {
+              withCredentials: true
+          });
+          setFavoriteCoins(response.data.map(fav => fav.symbol));
+      } catch (error) {
+          if (error.response?.status !== 401) {
+              console.error('즐겨찾기 목록 조회 실패:', error);
+          }
+      }
+  };
+	
+	useEffect(() => {
+	    if (user) {
+	      loadFavorites();
+	    } else {
+	      setFavoriteCoins([]);
+	    }
+	  }, [user]);
+  const checkLoginStatus = async () => {
+	try {
+	        const response = await axios.get('http://localhost:8080/api/user/info', {
+	          withCredentials: true
+	        });
+	        if (response.data) {
+	          loadFavorites();  // 로그인 되어있으면 즐겨찾기 목록 로드
+	        } else {
+	          setFavoriteCoins([]);  // 로그아웃 상태면 즐겨찾기 목록 초기화
+	        }
+	      } catch (error) {
+	        setFavoriteCoins([]);  // 에러 발생 시 즐겨찾기 목록 초기화
+	      }
+  };
   useEffect(() => {
     if (socketData) {
       const targetData = socketData.find((data) => data.code === selectedCoin[0]?.market);
@@ -149,9 +185,32 @@ const CoinSelector = () => {
     }
   }, [selectedCoin, socketData]);
 
-  const toggleFavorite = (coin) => {
-    setFavoriteCoins((prev) => (prev.includes(coin) ? prev.filter((item) => item !== coin) : [...prev, coin]));
-  };
+  const toggleFavorite = async (code, e) => {
+      e.stopPropagation();
+      try {
+        const symbol = code.split('-')[1]; // 'KRW-BTC'에서 'BTC' 추출
+        const coinName = marketCodes.find(market => market.market === code)?.korean_name;
+		console.log('Sending request with:', { symbol, coinName });
+        const response = await axios.post(
+          `http://localhost:8080/api/favorites/${symbol}?coinName=${coinName}`,
+          null,
+          { withCredentials: true }
+        );
+		console.log('Server response:', response.data);
+        if (response.data.favorited) {
+          setFavoriteCoins(prev => [...prev, symbol]);
+        } else {
+          setFavoriteCoins(prev => prev.filter(c => c !== symbol));
+        }
+      } catch (error) {
+        if (error.response?.status === 401) {
+          alert('로그인이 필요한 서비스입니다.');
+        } else {
+          console.error('즐겨찾기 설정 실패:', error);
+          alert('즐겨찾기 설정에 실패했습니다.');
+        }
+      }
+    };
 
   const clickCoinHandler = (evt) => {
     const currentTarget = marketCodes.filter(
@@ -160,6 +219,7 @@ const CoinSelector = () => {
     setSelectedCoin(currentTarget);
   };
 
+  
   return (
     <CoinListBox>
     <FavoriteButton onClick={() => setShowFavorites(!showFavorites)}>
@@ -176,14 +236,15 @@ const CoinSelector = () => {
         </HavingButton> */}
       {socketData
         ? socketData
-            .filter((coin) => !showFavorites || favoriteCoins.includes(coin.code))
+		.filter((coin) => !showFavorites || 
+		              (user && favoriteCoins.includes(coin.code.split('-')[1])))
             .map((data) => (
 <CoinBox
           key={data.code}
           id={data.code}
           onClick={clickCoinHandler}
           selected={selectedCoin[0]?.market === data.code}>                
-          <StarButton selected={favoriteCoins.includes(data.code)} onClick={(e) => { e.stopPropagation(); toggleFavorite(data.code); }}>★</StarButton>
+          <StarButton selected={favoriteCoins.includes(data.code.split('-')[1])} onClick={(e) => toggleFavorite(data.code, e)}>★</StarButton>
                 <CoinBoxName>
                 <div>{marketCodes.find((code) => code.market === data.code)?.korean_name}</div>
                 <div>{marketCodes.find((code) => code.market === data.code)?.market}</div>

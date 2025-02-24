@@ -1,5 +1,10 @@
 package com.crypto.trading.controller;
 
+import java.util.List;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -11,62 +16,57 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crypto.trading.dto.FavoriteDTO;
 import com.crypto.trading.dto.UserResponseDTO;
+import com.crypto.trading.entity.UserFavorite;
 import com.crypto.trading.service.FavoriteService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/favorites")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@Slf4j
 public class FavoriteController {
    private final FavoriteService favoriteService;  // 즐겨찾기 관련 서비스
    
-   @GetMapping  // 즐겨찾기 목록 조회
-   public ResponseEntity<?> getFavorites(HttpSession session){
-       UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
-       if(user == null) {
-           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-       }
-       
+   @GetMapping
+   public ResponseEntity<?> getFavorites(HttpSession session) {
        try {
-           return ResponseEntity.ok(favoriteService.getFavorites(user.getUsername()));
-       } catch (RuntimeException e) {
+           UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+           if (user == null) {
+               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+           }
+           
+           List<FavoriteDTO> favorites = favoriteService.getFavorites(user.getUsername());
+           return ResponseEntity.ok(favorites);
+       } catch (Exception e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
+   }
+
+   @PostMapping("/{symbol}")
+   public ResponseEntity<?> toggleFavorite(
+           @PathVariable("symbol") String symbol,
+           @RequestParam("coinName") String coinName,
+           HttpSession session) {
+       try {
+           UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
+           if (user == null) {
+               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+           }
+
+           boolean isNowFavorited = favoriteService.toggleFavorite(user.getUsername(), symbol, coinName);
+           return ResponseEntity.ok(Map.of("favorited", isNowFavorited));
+       } catch (Exception e) {
            return ResponseEntity.badRequest().body(e.getMessage());
        }
    }
    
-   @PostMapping  // 새 즐겨찾기 추가
-   public ResponseEntity<?> addFavorite(@RequestBody Map<String, String> request, HttpSession session) {
-       UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
-       if(user == null) {
-           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-       }
-       
-       try {
-           favoriteService.addFavorite(user.getUsername(), request.get("symbol"), request.get("coinname"));
-           return ResponseEntity.ok().build();
-       } catch (RuntimeException e) {
-           return ResponseEntity.badRequest().body(e.getMessage());
-       }
-   }
-   
-   @DeleteMapping("/{symbol}")  // 즐겨찾기 삭제
-   public ResponseEntity<?> deleteFavorite(@PathVariable("symbol") String symbol, HttpSession session){
-       UserResponseDTO user = (UserResponseDTO) session.getAttribute("LOGGED_IN_USER");
-       if(user == null) {
-           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-       }
-       
-       try {
-           favoriteService.deleteFavorite(user.getUsername(), symbol);
-           return ResponseEntity.ok().build();
-       } catch (RuntimeException e) {
-           return ResponseEntity.badRequest().body(e.getMessage());
-       }
-   }
 }

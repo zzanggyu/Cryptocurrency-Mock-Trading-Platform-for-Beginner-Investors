@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")  // 기본 URL 경로 설정
 @RequiredArgsConstructor  // 생성자 주입을 위한 롬복 어노테이션
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")  // CORS 설정
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")  
 public class UserController {
     private final UserService userService;  // 사용자 관련 비즈니스 로직 처리 서비스
 

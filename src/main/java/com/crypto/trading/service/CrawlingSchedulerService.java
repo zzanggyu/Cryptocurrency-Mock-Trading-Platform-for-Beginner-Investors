@@ -8,7 +8,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 
 /**
  * 뉴스 크롤링을 자동으로 실행하는 스케줄러 서비스
@@ -28,7 +27,7 @@ public class CrawlingSchedulerService {
      */ 
     @Scheduled(fixedRate = 900000)
     public void runCrawler() {
-        logger.info("크롤링 스케줄러 시작: {}", LocalDateTime.now());
+//        logger.info("크롤링 스케줄러 시작: {}", LocalDateTime.now());
         
         try {
             // resources/python 폴더에서 크롤러 스크립트 파일 경로 가져오기
@@ -46,18 +45,18 @@ public class CrawlingSchedulerService {
                     new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    logger.info("크롤러 출력: {}", line);
+//                    logger.info("크롤러 출력: {}", line);
                 }
             }
             
             // 프로세스가 종료될 때까지 대기
             int exitCode = process.waitFor();
-            logger.info("크롤링 완료. Exit Code: {}", exitCode);
+//            logger.info("크롤링 완료. Exit Code: {}", exitCode);
             // exitCode가 0이면 정상 종료, 그 외는 에러
             
         } catch (Exception e) {
             // 크롤링 실행 중 발생하는 모든 예외를 로깅
-            logger.error("크롤링 실행 중 오류 발생: ", e);
+//            logger.error("크롤링 실행 중 오류 발생: ", e);
         }
     }
 }

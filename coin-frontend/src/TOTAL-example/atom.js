@@ -25,3 +25,8 @@ export const selectedCoinInfoState = atom({
   key: "selectedCoinInfoState",
   default: {},
 });
+
+export const userState = atom({
+  key: "userState",
+  default: null
+});

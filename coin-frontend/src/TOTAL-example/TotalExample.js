@@ -42,6 +42,7 @@ const DisplayBoard = styled.main`
 function TotalExample() {
   const { isLoading, marketCodes: fetchedMC } = useFetchMarketCode();
   const [marketCodes, setMarketCodes] = useRecoilState(marketCodesState);
+  
 
   useEffect(() => {
     const MarketCodes_KRW = fetchedMC.filter((code) =>
