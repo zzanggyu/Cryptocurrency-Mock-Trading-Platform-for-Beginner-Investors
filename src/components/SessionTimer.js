@@ -1,3 +1,5 @@
+//SessionTimer.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -12,7 +14,7 @@ function SessionTimer({ setUser }) {
        }
        
        const elapsed = Math.floor((Date.now() - parseInt(sessionStart)) / 1000);
-       const remaining = Math.max(60 - elapsed, 0);
+       const remaining = Math.max(1800 - elapsed, 0);
        return remaining;
    });
    

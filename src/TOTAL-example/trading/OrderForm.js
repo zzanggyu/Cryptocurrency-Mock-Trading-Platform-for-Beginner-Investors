@@ -39,18 +39,19 @@ useEffect(() => {
 
   // 주문 수량과 가격을 기반으로 주문 총액을 계산
   const calculateOrderAmount = useCallback(() => {
-    const price = orderType === 'MARKET' ? selectedCoinInfo?.trade_price : parseFloat(formData.orderPrice);
-    const quantity = parseFloat(formData.orderQuantity);
+    const price = orderType === 'MARKET' 
+      ? selectedCoinInfo?.trade_price || 0 
+      : parseFloat(formData.orderPrice) || 0;
+    const quantity = parseFloat(formData.orderQuantity) || 0;
   
     if (price && quantity) {
       const amount = price * quantity;
-      // 소수점 없이 정수로만 계산
       const roundedAmount = Math.floor(amount);
       
       setFormData(prev => ({
         ...prev,
         orderAmount: roundedAmount.toLocaleString(),
-        price: price // 가격 정보도 저장
+        price: price
       }));
     }
   }, [orderType, selectedCoinInfo, formData.orderPrice, formData.orderQuantity]);
@@ -148,19 +149,22 @@ const handleSubmit = (e) => {
   onSubmit(orderData);
 };
 
-  const setPercentage = (percent) => {
-    if (!account || !selectedCoinInfo?.trade_price) return;
-  
-    if (type === 'buy') {
-      const available = account.balance;
-      const amount = (available * percent) / 100;
-      const quantity = amount / (orderType === 'MARKET' ? selectedCoinInfo.trade_price : parseFloat(formData.orderPrice));
-  
-      setFormData(prev => ({
-        ...prev,
-        orderQuantity: quantity.toFixed(8),
-        orderAmount: amount
-      }));
+const setPercentage = (percent) => {
+  if (!account || !selectedCoinInfo?.trade_price) return;
+
+  if (type === 'buy') {
+    const available = account.balance;
+    const amount = (available * percent) / 100;
+    const price = orderType === 'MARKET' 
+      ? selectedCoinInfo?.trade_price || 0 
+      : parseFloat(formData.orderPrice) || 0;
+    const quantity = price > 0 ? (amount / price) : 0;
+
+    setFormData(prev => ({
+      ...prev,
+      orderQuantity: quantity.toFixed(8),
+      orderAmount: amount
+    }));
 
 
       calculateOrderAmount();
@@ -224,7 +228,7 @@ const handleSubmit = (e) => {
             <label className="input-label">현재가</label>
             <input
               type="text"
-              value={`${selectedCoinInfo.trade_price.toLocaleString()} KRW`}
+              value={`${selectedCoinInfo?.trade_price?.toLocaleString() || 0} KRW`}
               readOnly
               className="text-input readonly-input"
             />

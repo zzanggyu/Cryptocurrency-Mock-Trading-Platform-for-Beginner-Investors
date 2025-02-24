@@ -1,3 +1,5 @@
+// App.js 
+
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -23,7 +25,7 @@ import './App.css';
 
 function App() {
     const [user, setUser] = React.useState(null);
-
+ 
     const checkLoginStatus = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/user/info', {
@@ -34,17 +36,36 @@ function App() {
             setUser(null);
         }
     };
-
+ 
+    // 초기 세션 체크와 주기적 체크 설정
     useEffect(() => {
+        // 초기 세션 체크 
         checkLoginStatus();
+ 
+        // 5분마다 세션 갱신을 위한 체크 (300000ms = 5분)
+        const interval = setInterval(checkLoginStatus, 300000);
+        
+        return () => clearInterval(interval);
     }, []);
-
+ 
+    // 로그인 성공 시 핸들러
+    const handleLoginSuccess = (userData) => {
+        setUser(userData);
+        // 로그인 후 즉시 세션 상태 체크
+        setTimeout(() => {
+            console.log("2초 후 세션 체크 실행");
+            checkLoginStatus();
+        }, 2000);
+    };
+   
+ 
     const handleLogout = async () => {
         try {
             await axios.post('http://localhost:8080/api/logout', {}, {
                 withCredentials: true
             });
             setUser(null);
+            localStorage.removeItem('sessionStart');
             window.location.href = '/';
         } catch (error) {
             console.error('로그아웃 실패:', error);
@@ -62,11 +83,11 @@ function App() {
                         </Link>
                         <div className="nav-menu">
                             <Link to="/trade" className="menu-item">거래소</Link>
-                            <Link to="/createaccount" className="menu-item">계좌관리</Link>
-                            <Link to="/invest" className="menu-item">포트폴리오</Link>
+                            <Link to="/createaccount" className="menu-item">계좌생성</Link>
+                            <Link to="/invest" className="menu-item">투자내역</Link>
                             <Link to="/trends" className="menu-item">코인동향</Link>
                             <Link to="/investment-survey" className="menu-item">투자관리</Link>
-                            <Link to="/accountlist" className="menu-item">거래내역</Link>
+                            <Link to="/accountlist" className="menu-item">계좌내역</Link>
                             <Link to="/boards" className="menu-item">커뮤니티</Link>
                         </div>
                         <div className="nav-links">
@@ -106,9 +127,14 @@ function App() {
                         <Route path="/trade" element={<TotalExample />} />
                         <Route path="/main" element={<MarketIndex />}/>
                         <Route path="/signup" element={<SignUp />} />
-                        <Route path="/login" element={<Login setUser={setUser} />} />
+                        <Route path="/login" element={
+                       <Login 
+                           setUser={setUser} 
+                           onLoginSuccess={handleLoginSuccess}
+                       />
+                   } />
                         <Route path="/mypage" element={<MyPage />} />
-                        <Route path="/investment-survey" element={<InvestmentSurvey />} />
+                        <Route path="/investment-survey" element={<InvestmentSurvey />}  />
                         <Route path="/boards" element={<BoardList />} />
                         <Route path="/boards/write" element={<BoardWrite />} />
                         <Route path="/boards/:id" element={<BoardDetail />} />

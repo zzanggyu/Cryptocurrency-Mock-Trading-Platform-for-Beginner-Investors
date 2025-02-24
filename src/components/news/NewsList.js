@@ -1,3 +1,5 @@
+// NewsList.js
+
 import React, { useState, useEffect, useCallback } from 'react';
 import NewsCard from './NewsCard';
 import axios from 'axios';
@@ -13,6 +15,7 @@ const NewsList = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const categories = [
         '전체 뉴스', '관심 뉴스', 'Digital Asset', 'Market', 'Finance',
@@ -125,6 +128,22 @@ const NewsList = () => {
         return matchesKeywords;
     });
 
+    const checkLoginStatus = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/user/info', {
+                withCredentials: true
+            });
+            setIsLoggedIn(true);
+        } catch (error) {
+            setIsLoggedIn(false);
+        }
+    };
+
+    // 컴포넌트 마운트 시 로그인 상태 체크
+    useEffect(() => {
+        checkLoginStatus();
+    }, []);
+
     return (
         <div className="news-wrapper">
             <div className="content-layout">
@@ -163,36 +182,37 @@ const NewsList = () => {
                     )}
 
                     <div className="news-container">
-                        <div className={`news-scroll ${isTransitioning ? 'transitioning' : ''}`}>
-                            {selectedCategory === '관심 뉴스' && news.length === 0 ? (
-                                <div className="login-required">
-                                    <p>로그인하면 관심 뉴스를 확인할 수 있습니다.</p>
-                                </div>
-                            ) : (
-                                <div className={`news-list ${loading ? 'loading' : ''}`}>
-                                    {filteredNews.map((item) => (
-                                        <NewsCard
-                                            key={item.id}
-                                            news={item}
-                                            onKeywordClick={handleKeywordClick}
-                                            refreshNews={() => {
-                                                if (selectedCategory === '관심 뉴스') {
-                                                    setTimeout(() => {
-                                                        setCurrentPage(0);
-                                                        fetchNews();
-                                                    }, 100);
-                                                }
-                                            }}
-                                        />
-                                    ))}
-                                    {filteredNews.length === 0 && !loading && (
-                                        <div className="no-results">
-                                            검색 결과가 없습니다.
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                            <div className={`news-scroll ${isTransitioning ? 'transitioning' : ''}`}>
+                                {selectedCategory === '관심 뉴스' && !isLoggedIn ? (
+                                    <div className="login-required">
+                                        <p>로그인하면 관심 뉴스를 확인할 수 있습니다.</p>
+                                    </div>
+                                ) : (
+                                    <div className={`news-list ${loading ? 'loading' : ''}`}>
+                                        {filteredNews.length === 0 && !loading ? (
+                                            <div className="no-results">
+                                                {selectedCategory === '관심 뉴스' ? '관심 뉴스가 없습니다.' : '검색 결과가 없습니다.'}
+                                            </div>
+                                        ) : (
+                                            filteredNews.map((item) => (
+                                                <NewsCard
+                                                    key={item.id}
+                                                    news={item}
+                                                    onKeywordClick={handleKeywordClick}
+                                                    refreshNews={() => {
+                                                        if (selectedCategory === '관심 뉴스') {
+                                                            setTimeout(() => {
+                                                                setCurrentPage(0);
+                                                                fetchNews();
+                                                            }, 100);
+                                                        }
+                                                    }}
+                                                />
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </div>
 
                         {hasMore && (
                             <div className="load-more">

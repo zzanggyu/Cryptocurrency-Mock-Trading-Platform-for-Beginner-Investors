@@ -1,3 +1,4 @@
+
 .news-card {
     border-bottom: 1px solid #e5e7eb;
     padding: 1rem 0;
@@ -37,14 +38,16 @@
     top: 0.5rem;
     right: 0.5rem;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: all 0.2s;
 }
 
 .favorite-icon.favorited {
-    color: #fbbf24;
+    fill: #FFD700 !important;
+    color: #FFD700;
 }
 
 .favorite-icon:not(.favorited) {
+    fill: #d1d5db;
     color: #d1d5db;
 }
 
@@ -120,3 +123,4 @@
     color: #6b7280;
     font-size: 0.75rem;
 }
+
