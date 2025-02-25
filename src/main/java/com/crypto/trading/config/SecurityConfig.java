@@ -51,6 +51,8 @@ public class SecurityConfig {
                     "/api/accounts/reset",
                     "/api/user/style",
                     "api/limit-orders/**",
+                    "/api/favorites",  // 이 부분이 있는지 확인
+                    "/api/favorites/**",
                     "/api/accounts/**"// Upbit API 접근 허용
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
