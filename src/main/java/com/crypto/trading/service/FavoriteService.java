@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FavoriteService {
 	private final UserFavoriteRepository favoriteRepository;
 	private final UserRepository userRepository;
