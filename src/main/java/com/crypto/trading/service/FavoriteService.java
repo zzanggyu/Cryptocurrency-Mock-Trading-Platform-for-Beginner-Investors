@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.crypto.trading.dto.FavoriteDTO;
 import com.crypto.trading.entity.User;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FavoriteService {
 	private final UserFavoriteRepository favoriteRepository;
 	private final UserRepository userRepository;
