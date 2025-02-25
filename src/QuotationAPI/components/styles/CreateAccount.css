@@ -1,134 +1,240 @@
 .create-account-container {
   min-height: 100vh;
-  padding: 20px;
-  background-color: #f5f5f5;
+  padding: 3rem 1.5rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 .create-account-wrapper {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 650px;
+  width: 100%;
 }
 
 .create-account-card {
   background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-account-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(to right, #4299e1, #667eea);
 }
 
 .create-account-title {
-  margin-bottom: 30px;
+  margin-bottom: 2.5rem;
   text-align: center;
-  color: #333;
+  color: #2d3748;
+  font-size: 2rem;
+  font-weight: 700;
+  position: relative;
+}
+
+.create-account-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(to right, #4299e1, #667eea);
+  margin: 1rem auto 0;
+  border-radius: 2px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
 .form-label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 0.75rem;
   font-weight: 600;
-  color: #333;
+  color: #4a5568;
+  font-size: 1rem;
 }
 
 .form-input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #f8fafc;
+  color: #2d3748;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
 }
 
 .error-message {
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #fff3f3;
-  border: 1px solid #ffcccc;
-  border-radius: 4px;
-  color: #dc3545;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background-color: #fff5f5;
+  border-left: 4px solid #e53e3e;
+  border-radius: 8px;
+  color: #c53030;
+  font-weight: 500;
 }
 
 .investment-info {
-  margin: 20px 0;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f7fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.investment-info:hover {
+  border-color: #bee3f8;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .info-text {
   display: flex;
   justify-content: space-between;
-  margin: 5px 0;
-  color: #666;
+  margin: 0.75rem 0;
+  color: #4a5568;
+  font-size: 1rem;
 }
 
 .info-value {
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #2d3748;
+  font-size: 1.1rem;
 }
 
 .submit-button {
   width: 100%;
-  padding: 12px;
-  background-color: #4a90e2;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(to right, #4299e1, #667eea);
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.2);
 }
 
 .submit-button:hover {
-  background-color: #357abd;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(66, 153, 225, 0.25);
+}
+
+.submit-button:active {
+  transform: translateY(0);
 }
 
 .submit-button:disabled {
-  background-color: #ccc;
+  background: #cbd5e0;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .reset-section {
-  margin: 20px 0;
-  padding: 15px;
-  border: 1px solid #ffcccc;
-  border-radius: 8px;
+  margin: 2rem 0 0.5rem;
+  padding: 1.5rem;
+  border: 1px solid #fed7d7;
+  border-radius: 12px;
   background-color: #fff5f5;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.reset-section:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .reset-button {
   width: 100%;
-  padding: 10px;
-  background-color: #dc3545;
+  padding: 0.875rem;
+  background-color: #e53e3e;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
 }
 
 .reset-button:hover {
-  background-color: #c82333;
+  background-color: #c53030;
 }
 
 .reset-button:disabled {
-  background-color: #6c757d;
+  background-color: #a0aec0;
   cursor: not-allowed;
 }
 
 .reset-warning {
   display: block;
-  margin-top: 8px;
-  color: #dc3545;
-  font-size: 12px;
+  margin-top: 1rem;
+  color: #c53030;
+  font-size: 0.875rem;
   text-align: center;
+  font-weight: 500;
+}
+
+/* 투자성향 진단 버튼 스타일 */
+.survey-button {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.875rem;
+  background: linear-gradient(to right, #38b2ac, #4299e1);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(56, 178, 172, 0.2);
+}
+
+.survey-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(56, 178, 172, 0.25);
+}
+
+.survey-button:active {
+  transform: translateY(0);
+}
+
+.survey-button:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .create-account-card {
+    padding: 2rem;
+  }
+  
+  .create-account-title {
+    font-size: 1.75rem;
+  }
+  
+  .form-input {
+    padding: 0.875rem 1rem;
+  }
 }

@@ -1,192 +1,267 @@
-/* src/styles/Investment.css */
+/* 개선된 Investment.css */
 .investment-container {
-    min-height: 100vh;
-    background-color: #f5f5f5;
-    padding: 2rem 0;
-  }
-  
-  .investment-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-  
-  .account-select-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .account-select-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-  
-  .account-select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
+  min-height: 100vh;
+  background-color: #f7f9fc;
+  padding: 2.5rem 0;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.investment-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* 카드 디자인 개선 */
+.account-select-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.8rem;
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.account-select-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+}
+
+.account-select-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #2d3748;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.7rem;
+}
+
+/* 계좌 정보 섹션 */
+.account-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #4299e1;
+}
+
+.account-number {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.account-balance {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* 계좌 요약 카드 */
+.account-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.summary-card {
+  background-color: #f8fafc;
+  padding: 1.3rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  background-color: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.summary-label {
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 0.4rem;
+  color: #2d3748;
+}
+
+/* 차트 섹션 */
+.chart-section {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.8rem;
+  margin-bottom: 2rem;
+}
+
+.chart-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #2d3748;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.7rem;
+}
+
+.chart-container {
+  height: 350px;
+  margin-bottom: 2.5rem;
+}
+
+/* 테이블 개선 */
+.holdings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+}
+
+.holdings-table th,
+.holdings-table td {
+  padding: 1rem;
+  text-align: right;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.holdings-table th:first-child,
+.holdings-table td:first-child {
+  text-align: left;
+  padding-left: 1.2rem;
+}
+
+.holdings-table th:last-child,
+.holdings-table td:last-child {
+  padding-right: 1.2rem;
+}
+
+.holdings-table th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  color: #4a5568;
+  position: sticky;
+  top: 0;
+  box-shadow: 0 1px 0 0 #e2e8f0;
+}
+
+.holdings-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.coin-name {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.coin-symbol {
+  color: #718096;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+/* 수익률 표시 */
+.profit {
+  color: #e53e3e;
+  font-weight: 600;
+}
+
+.loss {
+  color: #3182ce;
+  font-weight: 600;
+}
+
+/* 기간 선택기 */
+.period-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.period-selector {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.period-button {
+  padding: 0.5rem 1.2rem;
+  border: 1px solid #cbd5e0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.period-button:hover {
+  background-color: #edf2f7;
+}
+
+.period-button.active {
+  background: #4299e1;
+  color: white;
+  border-color: #4299e1;
+  box-shadow: 0 2px 10px rgba(66, 153, 225, 0.2);
+}
+
+.period-profits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+/* 로딩 메시지 */
+.loading-message {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-style: italic;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e0;
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #e53e3e;
+  background-color: #fff5f5;
+  border-radius: 8px;
+  border: 1px solid #fed7d7;
+  font-weight: 500;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
   .account-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .summary-card {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 4px;
-  }
-  
-  .summary-label {
-    color: #666;
-    font-size: 0.875rem;
-  }
-  
-  .summary-value {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-top: 0.25rem;
-  }
-  
-  .chart-section {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .chart-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-  
-  .chart-container {
-    height: 300px;
-    margin-bottom: 2rem;
+    grid-template-columns: 1fr 1fr;
   }
   
   .holdings-table {
-    width: 100%;
-    border-collapse: collapse;
+    font-size: 0.9rem;
   }
   
-  .holdings-table th,
-  .holdings-table td {
-    padding: 0.75rem;
-    text-align: right;
-    border-bottom: 1px solid #eee;
+  .investment-content {
+    padding: 0 1rem;
   }
-  
-  .holdings-table th:first-child,
-  .holdings-table td:first-child {
-    text-align: left;
-  }
-  
-  .holdings-table th {
-    background-color: #f8f9fa;
-    font-weight: 500;
-    color: #666;
-  }
-  
-  .coin-name {
-    font-weight: 500;
-  }
-  
-  .coin-symbol {
-    color: #666;
-    font-size: 0.875rem;
-    margin-left: 0.5rem;
-  }
-  
-  .profit {
-    color: #e53e3e;
-  }
-  
-  .loss {
-    color: #3182ce;
-  }
-  
-  .no-data-message {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-  }
-  
-  @media (max-width: 768px) {
-    .account-summary {
-      grid-template-columns: 1fr 1fr;
-    }
-    
-    .holdings-table {
-      font-size: 0.875rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .account-summary {
-      grid-template-columns: 1fr;
-    }
-  }
+}
 
-  /* src/styles/Investment.css에 추가 */
-
-.period-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+@media (max-width: 480px) {
+  .account-summary, .period-profits {
+    grid-template-columns: 1fr;
   }
   
-  .period-selector {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .period-button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    background: white;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .period-button.active {
-    background: #4299e1;
-    color: white;
-    border-color: #4299e1;
-  }
-  
-  .period-profits {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  .period-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 1rem;
-    margin-top: 1rem;
   }
-  
-  .profit {
-    color: #e53e3e;
-  }
-  
-  .loss {
-    color: #3182ce;
-  }
-
-  /* src/styles/Investment.css에 추가 */
-.loading-message {
-    text-align: center;
-    padding: 1rem;
-    color: #666;
-    font-style: italic;
-  }
+}

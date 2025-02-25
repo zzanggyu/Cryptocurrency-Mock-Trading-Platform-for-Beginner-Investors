@@ -57,6 +57,8 @@ function App() {
             checkLoginStatus();
         }, 2000);
     };
+
+
    
  
     const handleLogout = async () => {
@@ -83,11 +85,11 @@ function App() {
                         </Link>
                         <div className="nav-menu">
                             <Link to="/trade" className="menu-item">거래소</Link>
-                            <Link to="/createaccount" className="menu-item">계좌생성</Link>
+                            <Link to="/createaccount" className="menu-item">계좌설정</Link>
                             <Link to="/invest" className="menu-item">투자내역</Link>
                             <Link to="/trends" className="menu-item">코인동향</Link>
-                            <Link to="/investment-survey" className="menu-item">투자관리</Link>
-                            <Link to="/accountlist" className="menu-item">계좌내역</Link>
+                            <Link to="/investment-survey" className="menu-item">투자성향 진단</Link>
+                            <Link to="/accountlist" className="menu-item">거래내역</Link>
                             <Link to="/boards" className="menu-item">커뮤니티</Link>
                         </div>
                         <div className="nav-links">
@@ -132,6 +134,7 @@ function App() {
                            setUser={setUser} 
                            onLoginSuccess={handleLoginSuccess}
                        />
+               
                    } />
                         <Route path="/mypage" element={<MyPage />} />
                         <Route path="/investment-survey" element={<InvestmentSurvey />}  />

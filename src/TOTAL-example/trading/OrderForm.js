@@ -20,15 +20,18 @@ export default function OrderForm({ type = 'buy', account, onSubmit }) {
   // 선택된 코인이 변경될 때마다 가격 정보 업데이트
   // 선택된 코인이 변경될 때마다 가격 정보 업데이트
   useEffect(() => {
-    if (selectedCoinInfo && !userModifiedPrice) {
+    if (selectedCoinInfo) {  // selectedCoinInfo가 있을 때만 실행
       setFormData(prev => ({
         ...prev,
-        orderPrice: selectedCoinInfo.trade_price.toString(),
-        orderQuantity: '',
-        orderAmount: ''
+        orderPrice: userModifiedPrice ? prev.orderPrice : selectedCoinInfo.trade_price?.toString() || '0',
+        orderQuantity: prev.orderQuantity || '', 
+        orderAmount: prev.orderAmount || ''
       }));
     }
-  }, [selectedCoinInfo, selectedCoin]);
+  }, [selectedCoinInfo, selectedCoin, userModifiedPrice]);
+  
+  
+  
   
 
 
@@ -39,19 +42,18 @@ useEffect(() => {
 
   // 주문 수량과 가격을 기반으로 주문 총액을 계산
   const calculateOrderAmount = useCallback(() => {
-    const price = orderType === 'MARKET' 
-      ? selectedCoinInfo?.trade_price || 0 
-      : parseFloat(formData.orderPrice) || 0;
-    const quantity = parseFloat(formData.orderQuantity) || 0;
+    const price = orderType === 'MARKET' ? selectedCoinInfo?.trade_price : parseFloat(formData.orderPrice);
+    const quantity = parseFloat(formData.orderQuantity);
   
     if (price && quantity) {
       const amount = price * quantity;
+      // 소수점 없이 정수로만 계산
       const roundedAmount = Math.floor(amount);
       
       setFormData(prev => ({
         ...prev,
         orderAmount: roundedAmount.toLocaleString(),
-        price: price
+        price: price // 가격 정보도 저장
       }));
     }
   }, [orderType, selectedCoinInfo, formData.orderPrice, formData.orderQuantity]);
@@ -59,52 +61,63 @@ useEffect(() => {
   const handleAmountChange = (e) => {
     setActiveInput('amount');
   
-    let newAmount = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 입력 가능 (소수점 제거)
+    let newAmount = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 입력 가능
+  
+    if (newAmount === '') {
+      setFormData((prevData) => ({
+        ...prevData,
+        orderAmount: '',
+        orderQuantity: '' // 주문 금액이 비워지면 주문 수량도 비움
+      }));
+      return;
+    }
+  
+    newAmount = parseInt(newAmount, 10);
   
     setFormData((prevData) => {
-      if (newAmount === '') {
-        return {
-          ...prevData,
-          orderAmount: '',
-          orderQuantity: '', // 주문 금액이 비워지면 주문 수량도 비움
-        };
-      }
-  
-      // 주문금액이 정수로만 입력되도록
-      newAmount = parseInt(newAmount, 10);
-  
+      if (!prevData.price) return { ...prevData, orderAmount: newAmount };
+      
       return {
         ...prevData,
-        orderAmount: newAmount, // 정수로 유지
+        orderAmount: newAmount,
+        orderQuantity: (newAmount / prevData.price).toFixed(8) // 주문 수량 계산
       };
     });
   };
+  
 
-const handleQuantityChange = (e) => {
-  setActiveInput('quantity');
+  const handleQuantityChange = (e) => {
+    setActiveInput('quantity');
+  
+    let newQuantity = e.target.value.replace(/[^0-9.]/g, ''); // 소수점 허용
+  
+    if (newQuantity === '') {
+      setFormData((prevData) => ({
+        ...prevData,
+        orderQuantity: '',
+        orderAmount: '' // 주문 수량이 비워지면 주문 금액도 비움
+      }));
+      return;
+    }
+  
+    newQuantity = parseFloat(newQuantity);
+  
+    setFormData((prevData) => {
+      if (!prevData.price) return { ...prevData, orderQuantity: newQuantity };
+  
+      return {
+        ...prevData,
+        orderQuantity: newQuantity,
+        orderAmount: Math.floor(newQuantity * prevData.price).toLocaleString() // 주문 금액 계산
+      };
+    });
+  };
+  
 
-  let newQuantity = e.target.value.replace(/[^0-9.]/g, ''); // 소수점 허용
-
-  setFormData((prevData) => ({
-    ...prevData,
-    orderQuantity: newQuantity,
-    orderAmount: newQuantity ? prevData.orderAmount : '', // 주문 수량이 비워지면 주문 금액도 비우기
-  }));
-};
-
-const handleBlur = () => {
-  setFormData((prev) => {
-    const price = orderType === 'MARKET' ? selectedCoinInfo?.trade_price : parseFloat(prev.orderPrice);
-
-    if (!price || !prev.orderAmount) return prev; // 가격이 없거나 주문 금액이 없으면 계산 안 함
-
-    let newAmount = parseInt(prev.orderAmount, 10); // 정수 변환
-
-    return { ...prev, orderQuantity: (newAmount / price).toFixed(8) }; // 주문 수량 다시 계산
-  });
-
-  setActiveInput(null); // 입력 완료 후 초기화
-};
+  const handleBlur = () => {
+    setActiveInput(null);
+  };
+  
 
   
 
@@ -149,22 +162,19 @@ const handleSubmit = (e) => {
   onSubmit(orderData);
 };
 
-const setPercentage = (percent) => {
-  if (!account || !selectedCoinInfo?.trade_price) return;
-
-  if (type === 'buy') {
-    const available = account.balance;
-    const amount = (available * percent) / 100;
-    const price = orderType === 'MARKET' 
-      ? selectedCoinInfo?.trade_price || 0 
-      : parseFloat(formData.orderPrice) || 0;
-    const quantity = price > 0 ? (amount / price) : 0;
-
-    setFormData(prev => ({
-      ...prev,
-      orderQuantity: quantity.toFixed(8),
-      orderAmount: amount
-    }));
+  const setPercentage = (percent) => {
+    if (!account || !selectedCoinInfo?.trade_price) return;
+  
+    if (type === 'buy') {
+      const available = account.balance;
+      const amount = (available * percent) / 100;
+      const quantity = amount / (orderType === 'MARKET' ? selectedCoinInfo.trade_price : parseFloat(formData.orderPrice));
+  
+      setFormData(prev => ({
+        ...prev,
+        orderQuantity: quantity.toFixed(8),
+        orderAmount: amount
+      }));
 
 
       calculateOrderAmount();
