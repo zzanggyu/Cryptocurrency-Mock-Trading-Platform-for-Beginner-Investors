@@ -47,7 +47,7 @@
     - Redux Toolkit으로 복잡한 상태 관리
     - Chart.js로 다양한 차트 구현
     - WebSocket으로 실시간 데이터 처리
-    - Tailwind CSS로 반응형 UI 구현
+    - 반응형 UI 구현
 3. 데이터베이스 (MySQL)
     - 트랜잭션 처리가 안정적
     - 사용자 데이터, 거래 내역 등의 관계형 데이터 처리에 적합
